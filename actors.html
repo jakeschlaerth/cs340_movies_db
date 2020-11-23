@@ -25,9 +25,11 @@
     </nav>
     <h1>Add, Delete, or Edit Actors</h1>
     <div class='table-and-forms'>
-        <table>
+        <table id="actorsTable">
+            
             <thead>
                 <row>
+                    <th style="visibility: hidden;"></th>
                     <th>First Name</th>
                     <th>Last Name</th>
                     <th></th>
@@ -35,18 +37,15 @@
                 </row>
             </thead>
             <tbody>
-                <row>
-                    <td>Samual</td>
-                    <td>Jackson</td>
-                    <td><button type='button' onclick=''
-                            class='btn btn-default'>Edit</button></td>
-                    <td><button type='button' onclick=''
-                            class='btn btn-default'>Delete</button></td>
-                </row>
+                
             </tbody>
         </table>
+<<<<<<< HEAD
         <h2>Add New Actor</h2>
         <form method="POST" id="addActorForm">
+=======
+        <form id="addActorForm">
+>>>>>>> a5229fcabf3920c53f8d3aecb52a2dcb15aef31d
             <fieldset>
                 <label>
                     First Name:
@@ -69,7 +68,7 @@
 
 
     </div>
-    <script src="script.js"></script>
+    <script src="actorsScript.js"></script>
 </body>
 
 </html>

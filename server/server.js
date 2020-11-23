@@ -30,8 +30,11 @@ const makeTableQuery = `CREATE TABLE movies(
                         unit BOOLEAN, 
                         date DATE);`;
 
-const getDirectorsQuery = 'SELECT director_id, first_name, last_name FROM directors ORDER BY last_name';
+const getDirectorsQuery = 'SELECT director_id, first_name, last_name FROM directors ORDER BY last_name;';
 
+const getComposersQuery = 'SELECT composer_id, first_name, last_name FROM composers ORDER BY last_name;';
+
+const getActorsQuery = 'SELECT actor_id, first_name, last_name FROM actors ORDER BY last_name;';
 
 
 const getAllData = (current_query, res) => {
@@ -59,6 +62,18 @@ app.get('/', function (req, res, next) {
     if (req.headers.table_name == 'directors') {
         var current_query = getDirectorsQuery;
         console.log("req header is equal to directors");
+    }
+
+    // composers in req header
+    if (req.headers.table_name == 'composers') {
+        var current_query = getComposersQuery;
+        console.log("req header is equal to composers");
+    }
+
+    // actors in get req header
+    if (req.headers.table_name == 'actors') {
+        var current_query = getActorsQuery;
+        console.log("req header is equal to actors")
     }
 
     mysql.pool.query(current_query, (err, rows, fields) => {
