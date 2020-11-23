@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+ <head>
+  <meta charset="UTF-8">
+  <title>Directors</title>
+  <link rel="stylesheet" href="styles.css">
+<link
+    href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400&display=swap"
+    rel="stylesheet">
+ </head>
+ <body>
+    <nav class="navbar-container">
+        <ul class="navbar-list">
+            <li><a href="movies.html">View movies</a></li>
+            <li><a href="actors.html">View actors</a></li>
+            <li><a href="directors.html">View directors</a></li>
+            <li><a href="composers.html">View composers</a></li>
+            <li><a href="performances.html">View actor-movie pairings</a></li>
+            <li><a href="genres.html">View existing genres</a></li>
+            <li><a href="genreInstances.html">View all Genre-Movie pairings</a>
+            </li>
+        </ul>
+    </nav>
+  <h1>Add, Delete, or Edit Directors</h1>
+  <div class='table-and-forms'>
+      <table>
+          <thead>
+              <row>
+                  <th>First Name</th>
+                  <th>Last Name</th>
+                  <th></th>
+                  <th></th>
+              </row>
+          </thead>
+          <tbody>
+              <row>
+                  <td>George</td>
+                  <td>Lucas</td>
+                  <td><button type='button' onclick='' class='btn btn-default'>Edit</button></td>
+                  <td><button type='button' onclick='' class='btn btn-default'>Delete</button></td>
+              </row>
+          </tbody>
+      </table>
+      <form id="directorForm">
+          <fieldset>
+            <br>
+            <legend>Add a New Director</legend>
+            <input type="text" id="firstname" placeholder="First Name"><br>
+            <input type="text" id="lastname" placeholder="Last Name"><br>
+            <button type="submit" form="directorForm" value="Submit">Submit</button>
+          </fieldset>
+      </form>
+
+    <form id="directorSearch">
+        <fieldset>
+            <legend>Search For a director</legend>
+            <input type="text" id="directorSearchInput" placeholder="Director Name">
+            <button type="submit" form="directorSearch" value="Submit">Search</button>
+        </fieldset>
+    </form>
+
+
+  </div>
+  <script src="script.js"></script>
+ </body>
+</html>
