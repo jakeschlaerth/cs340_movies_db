@@ -8,16 +8,6 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(CORS());
 
-const getAllQuery = `SELECT 
-                    title, 
-                    release_year, 
-                    CONCAT(directors.first_name, ' ', directors.last_name) AS director, 
-                    CONCAT(composers.first_name, ' ', composers.last_name) AS composer 
-                    FROM movies
-                    INNER JOIN directors ON movies.director_id = directors.director_id
-                    INNER JOIN composers ON movies.composer_id = composers.composer_id
-                    ORDER BY release_year;`;
-
 const getMoviesQuery = `SELECT 
                     title, 
                     release_year, 
