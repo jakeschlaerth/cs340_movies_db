@@ -1,4 +1,4 @@
-const baseURL = `http://localhost:19191`;  
+const baseURL = `http://localhost:19191`;
 // `http://flip2.engr.oregonstate.edu:19191` (or wherever you run the server) when live  
 // `http://localhost:19191` when local
 
@@ -6,12 +6,12 @@ const baseURL = `http://localhost:19191`;
 var req = new XMLHttpRequest();
 
 req.open("GET", baseURL, true);
-req.setRequestHeader("table_name", "movies", false);    // set what table we are requesting
+req.setRequestHeader("table_name", "directors", false);    // set what table we are requesting
 req.onload = (e) => {
     if (req.readyState === 4) {
         if (req.status === 200) {
             var response = JSON.parse(req.responseText);
-            var allRows = response.rows
+            var allRows = response.rows;
             console.log(response);
             makeTable(allRows);
 
@@ -24,14 +24,14 @@ req.send();
 
 
 // reference for table
-const table = document.getElementById('moviesTable');
+const table = document.getElementById('directorsTable');
 
 const makeTable = (allRows) => {
     for (var row = 0; row < allRows.length; row++) {
         var currentRow = allRows[row];
         makeRow(currentRow, table);
     };
-}; 
+};
 
 const makeRow = (currentRow, table) => {
     // reference for moviesTable body
@@ -43,7 +43,7 @@ const makeRow = (currentRow, table) => {
     // new cell
     var idCell = document.createElement("td");
     // new cell text
-    var idCellText = document.createTextNode(currentRow.movieID);
+    var idCellText = document.createTextNode(currentRow.director_id);
     // hide cell
     idCell.style.visibility = "hidden";
     // append text to cell
@@ -52,17 +52,12 @@ const makeRow = (currentRow, table) => {
     row.appendChild(idCell);
 
     // make cell for each datum
-    makeCell(currentRow.title, row);
-    makeCell(currentRow.release_year, row);
-    let director_id = currentRow.director_id;
+    makeCell(currentRow.first_name, row);
+    makeCell(currentRow.last_name, row);
 
-    makeCell(currentRow.director, row); // TODO look up a director ID, currently hardcoded
-    makeCell(currentRow.composer, row); // TODO look up a composer ID
-    // makeCell(currentRow.genres, row);   // parse all genre instances with this movieID
-
-    // view genres button
+    // view movies button
     viewGenresButton = document.createElement("button");
-    viewGenresButton.innerHTML = "View genres";
+    viewGenresButton.innerHTML = "View movies";
     viewGenresButton.id = "viewGenresButton";
     // new cell
     var viewGenresCell = document.createElement("td");
@@ -71,20 +66,9 @@ const makeRow = (currentRow, table) => {
     // append cell to row
     row.append(viewGenresCell);
 
-    // view Actors button
-    viewActorsButton = document.createElement("button");
-    viewActorsButton.innerHTML = "View actors";
-    viewActorsButton.id = "viewActorsButton";
-    // new cell
-    var viewActorsCell = document.createElement("td");
-    // append button to cell
-    viewActorsCell.appendChild(viewActorsButton);
-    // append cell to row
-    row.append(viewActorsCell);
-
     // update button
     updateButton = document.createElement("button");
-    updateButton.innerHTML = "update";
+    updateButton.innerHTML = "edit";
     updateButton.id = "updateButton";
     // new cell
     var updateCell = document.createElement("td");
@@ -121,7 +105,7 @@ const makeCell = (data, row) => {
 
 
 // submit row POST request, add row
-const newRowSubmit = document.getElementById('addMovieForm');
+const newRowSubmit = document.getElementById('addDirectorForm');
 newRowSubmit.addEventListener('submit', (e) => {
     e.preventDefault();
     var req = new XMLHttpRequest();
