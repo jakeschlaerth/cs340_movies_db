@@ -40,7 +40,7 @@ const makeTableQuery = `CREATE TABLE movies(
                         unit BOOLEAN, 
                         date DATE);`;
 
-const getDirectorsQuery = 'SELECT first_name, last_name FROM directors ORDER BY last_name';
+const getDirectorsQuery = 'SELECT director_id, first_name, last_name FROM directors ORDER BY last_name';
 
 
 
@@ -60,12 +60,13 @@ const getAllData = (current_query, res) => {
 app.get('/', function (req, res, next) {
 
     // movies in get req header
-    if (req.headers.table_name = 'movies') {
+    if (req.headers.table_name == 'movies') {
         var current_query = getMoviesQuery;
+        console.log("req header is equasl to movies")
     }
 
     // directors in req header
-    if (req.headers.table_name = 'directors') {
+    if (req.headers.table_name == 'directors') {
         var current_query = getDirectorsQuery;
         console.log("req header is equal to directors");
     }
