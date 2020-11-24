@@ -110,19 +110,13 @@ newRowSubmit.addEventListener('submit', (e) => {
     e.preventDefault();
     var req = new XMLHttpRequest();
     var payload = {
-        title: null,
-        releaseYear: null,
-        director: null,
-        composer: null,
-        genres: null,
+        first_name: null,
+        last_name: null,
     };
-    payload.name = document.getElementById("titleInput").value;
-    payload.releaseYear = document.getElementById("releaseYearInput").value;
-    payload.director = document.getElementById("directorInput").value;
-    payload.composer = document.getElementById("composerInput").value;
-    payload.genres = document.getElementById("genresInput").value;
+    payload.first_name = document.getElementById("firstNameInput").value;
+    payload.last_name = document.getElementById("lastNameInput").value;
 
-    req.open("POST", baseURL, true);
+    req.open("POST", `http://localhost:19191/add_actor`, true);
     req.setRequestHeader('Content-Type', 'application/json');
     req.onload = (e) => {
         if (req.readyState === 4) {

@@ -18,17 +18,17 @@ const getMoviesQuery = `SELECT
                     INNER JOIN composers ON movies.composer_id = composers.composer_id
                     ORDER BY release_year;`;
 
-const insertQuery = "INSERT INTO movies (`name`, `reps`, `weight`, `unit`, `date`) VALUES (?, ?, ?, ?, ?)";
-const updateQuery = "UPDATE movies SET title=?, release_year=?, weight=?, unit=?, date=? WHERE id=?";
+const insertQuery = "INSERT INTO movies (`title`, `release_year`) VALUES (?, ?)";
+const insertActorQuery = "INSERT INTO actors (`first_name`, `last_name`) VALUES (?, ?)";
+const updateQuery = "UPDATE movies SET title=?, release_year=? WHERE id=?";
 const deleteQuery = "DELETE FROM movies WHERE id=?";
 const dropTableQuery = "DROP TABLE IF EXISTS movies";
 const makeTableQuery = `CREATE TABLE movies(
                         id INT PRIMARY KEY AUTO_INCREMENT, 
-                        name VARCHAR(255) NOT NULL,
-                        reps INT,
-                        weight INT,
-                        unit BOOLEAN, 
-                        date DATE);`;
+                        title VARCHAR(255) NOT NULL,
+                        release_year INT,
+                        director_id INT,
+                        composer_id INT);`;
 
 const getDirectorsQuery = 'SELECT director_id, first_name, last_name FROM directors ORDER BY last_name;';
 
@@ -55,7 +55,7 @@ app.get('/', function (req, res, next) {
     // movies in get req header
     if (req.headers.table_name == 'movies') {
         var current_query = getMoviesQuery;
-        console.log("req header is equasl to movies")
+        console.log("req header is equal to movies")
     }
 
     // directors in req header
@@ -88,7 +88,7 @@ app.get('/', function (req, res, next) {
 // insert row
 app.post('/', function (req, res, next) {
     var context = {};
-    mysql.pool.query(insertQuery, [req.body.name, req.body.reps, req.body.weight, req.body.unit, req.body.date], (err, result) => {
+    mysql.pool.query(insertQuery, [req.body.title, req.body.release_year, req.body.director_id, req.body.composer_id], (err, result) => {
         if (err) {
             next(err);
             return;
