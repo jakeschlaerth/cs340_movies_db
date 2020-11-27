@@ -1,5 +1,5 @@
-const baseURL = `http://localhost:19191`;
-// `http://flip2.engr.oregonstate.edu:19191` (or wherever you run the server) when live  
+const baseURL = `http://localhost:22222`;
+//const baseURL =  `http://flip3.engr.oregonstate.edu:19191` // (or wherever you run the server) when live  
 // `http://localhost:19191` when local
 
 // basic get request, builds table
@@ -116,7 +116,7 @@ newRowSubmit.addEventListener('submit', (e) => {
     payload.first_name = document.getElementById("firstNameInput").value;
     payload.last_name = document.getElementById("lastNameInput").value;
 
-    req.open("POST", `http://localhost:19191/add_actor`, true);
+    req.open("POST", `http://localhost:22222/add_actor`, true);
     req.setRequestHeader('Content-Type', 'application/json');
     req.onload = (e) => {
         if (req.readyState === 4) {
@@ -129,5 +129,6 @@ newRowSubmit.addEventListener('submit', (e) => {
             }
         }
     };
+    console.log(payload.first_name + "  " + payload.last_name);
     req.send(JSON.stringify(payload));
 });

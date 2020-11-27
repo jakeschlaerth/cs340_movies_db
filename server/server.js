@@ -3,7 +3,7 @@ var mysql = require('../dbcon.js');
 var CORS = require('cors');
 
 var app = express();
-app.set('port', 19191);
+app.set('port', 22222);
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(CORS());
@@ -85,15 +85,30 @@ app.get('/', function (req, res, next) {
     });
 });
 
-// insert row
-app.post('/', function (req, res, next) {
-    var context = {};
-    mysql.pool.query(insertQuery, [req.body.title, req.body.release_year, req.body.director_id, req.body.composer_id], (err, result) => {
+app.get('/actors', function (req, res, next) {
+    var current_query = getActorsQuery;
+    mysql.pool.query(current_query, (err, rows, fields) => {
         if (err) {
             next(err);
             return;
         }
-        getAllData(res);
+        getAllData(current_query, res);
+    });    
+})
+
+// insert row
+app.post('/add_actor', function (req, res) {
+    sql = mysql.pool.query(insertActorQuery, [req.body.first_name, req.body.last_name], (err, result) => {
+        console.log("started");
+        if (err) {
+            res.write(JSON.stringify(error));
+            res.end();
+        }
+        else{
+            console.log("start redirect");
+            res.redirect(308, '/actors');
+            console.log('page reloaded');
+        }
     });
 });
 

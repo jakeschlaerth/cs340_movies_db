@@ -1,5 +1,5 @@
 const baseURL = `http://localhost:19191`;  
-// `http://flip2.engr.oregonstate.edu:19191` (or wherever you run the server) when live  
+//const baseURL = `http://flip3.engr.oregonstate.edu:19191` // (or wherever you run the server) when live  
 // `http://localhost:19191` when local
 
 // basic get request, builds table
@@ -16,6 +16,7 @@ req.onload = (e) => {
             makeTable(allRows);
 
         } else {
+            console.log(baseURL)
             console.error(req.statusText);
         }
     }
