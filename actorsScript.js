@@ -122,7 +122,12 @@ newRowSubmit.addEventListener('submit', (e) => {
         if (req.readyState === 4) {
             if (req.status === 200) {
                 // this is where the magic happens
+                console.log(req.responseText);
                 var response = JSON.parse(req.responseText);
+                var allRows = response.rows
+                var newActorIndex = allRows.length - 1;
+                var newRow = allRows[newActorIndex];
+                makeRow(newRow, table);
                 // return success or failure here
             } else {
                 console.error(req.statusText);

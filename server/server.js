@@ -22,6 +22,7 @@ const insertQuery = "INSERT INTO movies (`title`, `release_year`) VALUES (?, ?)"
 const insertActorQuery = "INSERT INTO actors (`first_name`, `last_name`) VALUES (?, ?)";
 const updateQuery = "UPDATE movies SET title=?, release_year=? WHERE id=?";
 const deleteQuery = "DELETE FROM movies WHERE id=?";
+const deleteActorQuery = "DELETE FROM actors WHERE actor_id=?";
 const dropTableQuery = "DROP TABLE IF EXISTS movies";
 const makeTableQuery = `CREATE TABLE movies(
                         id INT PRIMARY KEY AUTO_INCREMENT, 
@@ -35,7 +36,7 @@ const getDirectorsQuery = 'SELECT director_id, first_name, last_name FROM direct
 const getComposersQuery = 'SELECT composer_id, first_name, last_name FROM composers ORDER BY last_name;';
 
 const getActorsQuery = 'SELECT actor_id, first_name, last_name FROM actors ORDER BY last_name;';
-
+const getActorsByID = 'SELECT actor_id, first_name, last_name FROM actors ORDER BY actor_id;';
 
 const getAllData = (current_query, res) => {
     mysql.pool.query(current_query, (err, rows, fields) => {
@@ -86,7 +87,8 @@ app.get('/', function (req, res, next) {
 });
 
 app.get('/actors', function (req, res, next) {
-    var current_query = getActorsQuery;
+    // Select actors by ID here, easier to grab the most recent actor and update the table. Probably an easier way to do this.
+    var current_query = getActorsByID;
     mysql.pool.query(current_query, (err, rows, fields) => {
         if (err) {
             next(err);
@@ -105,9 +107,9 @@ app.post('/add_actor', function (req, res) {
             res.end();
         }
         else{
-            console.log("start redirect");
-            res.redirect(308, '/actors');
-            console.log('page reloaded');
+            // redirect to the new /actors GET handler. Will grab new actors table after the insert and return to client.
+            // Probably a way to send back to the standard '/' GET handler, but unsure how to include req.header currently
+            res.redirect('/actors');
         }
     });
 });
