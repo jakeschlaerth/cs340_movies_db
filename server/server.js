@@ -19,30 +19,44 @@ const getMoviesQuery = `SELECT
                     INNER JOIN composers ON movies.composer_id = composers.composer_id
                     ORDER BY release_year;`;
 
-const insertQuery = "INSERT INTO movies (`title`, `release_year`) VALUES (?, ?)";
-const insertActorQuery = "INSERT INTO actors (`first_name`, `last_name`) VALUES (?, ?)";
-// const updateQuery = "UPDATE movies SET title=?, release_year=? WHERE id=?";
-const deleteQuery = "DELETE FROM movies WHERE id=?";
-const deleteActorQuery = "DELETE FROM actors WHERE actor_id=?";
-const dropTableQuery = "DROP TABLE IF EXISTS movies";
-const makeTableQuery = `CREATE TABLE movies(
-                        id INT PRIMARY KEY AUTO_INCREMENT, 
-                        title VARCHAR(255) NOT NULL,
-                        release_year INT,
-                        director_id INT,
-                        composer_id INT);`;
-
 const getDirectorsQuery = 'SELECT director_id, first_name, last_name FROM directors ORDER BY last_name;';
 
 const getComposersQuery = 'SELECT composer_id, first_name, last_name FROM composers ORDER BY last_name;';
 
 const getActorsQuery = 'SELECT actor_id, first_name, last_name FROM actors ORDER BY last_name;';
+
+const insertMovieQuery = `INSERT INTO movies 
+                            (title, release_year, director_id, composer_id) 
+                            VALUES (?, ?, ?, ?)`;
+
+const insertDirectorQuery = `INSERT INTO directors
+                                (first_name, last_name)
+                                VALUES (?, ?)`;
+
+const insertComposerQuery = `INSERT INTO composers
+                                (first_name, last_name)
+                                VALUES (?, ?)`;
+
+const insertActorQuery = "INSERT INTO actors (`first_name`, `last_name`) VALUES (?, ?)";
+
+// const makeTableQuery = `CREATE TABLE movies(
+//                         id INT PRIMARY KEY AUTO_INCREMENT, 
+//                         title VARCHAR(255) NOT NULL,
+//                         release_year INT,
+//                         director_id INT,
+//                         composer_id INT);`;
+
 const getActorsByID = 'SELECT actor_id, first_name, last_name FROM actors ORDER BY actor_id;';
 
-const updateMoviesQuery = 'UPDATE movies SET title=?, release_year=?, director_id=?, composer_id=? WHERE movie_id=?'
-const updateDirectorsQuery = 'UPDATE directors SET first_name=?, last_name=? WHERE director_id=?'
-const updateComposersQuery = 'UPDATE composers SET first_name=?, last_name=? WHERE composer_id=?'
-const updateActorsQuery = 'UPDATE actors SET first_name=?, last_name=? WHERE actor_id=?'
+const updateMoviesQuery = 'UPDATE movies SET title=?, release_year=?, director_id=?, composer_id=? WHERE movie_id=?;';
+const updateDirectorsQuery = 'UPDATE directors SET first_name=?, last_name=? WHERE director_id=?;';
+const updateComposersQuery = 'UPDATE composers SET first_name=?, last_name=? WHERE composer_id=?;'
+const updateActorsQuery = 'UPDATE actors SET first_name=?, last_name=? WHERE actor_id=?;';
+
+const deleteMovieQuery = `DELETE FROM movies WHERE movie_id=?;`;
+const deleteDirectorQuery = `DELETE FROM directors WHERE director_id=?;`;
+const deleteComposerQuery = `DELETE FROM composers WHERE composer_id=?;`;
+const deleteActorQuery = `DELETE FROM actors WHERE actor_id=?;`;
 
 const getAllData = (current_query, res) => {
     mysql.pool.query(current_query, (err, rows, fields) => {
@@ -54,122 +68,151 @@ const getAllData = (current_query, res) => {
     });
 };
 
-// get all data
+// read all data
 app.get('/', function (req, res, next) {
-
+    var currentQuery;
     // movies in get req header
     if (req.headers.table_name == 'movies') {
-        var current_query = getMoviesQuery;
+        currentQuery = getMoviesQuery;
     }
 
     // directors in req header
     if (req.headers.table_name == 'directors') {
-        var current_query = getDirectorsQuery;
+        currentQuery = getDirectorsQuery;
     }
 
     // composers in req header
     if (req.headers.table_name == 'composers') {
-        var current_query = getComposersQuery;
+        currentQuery = getComposersQuery;
     }
 
     // actors in get req header
     if (req.headers.table_name == 'actors') {
-        var current_query = getActorsQuery;
+        currentQuery = getActorsQuery;
     }
 
-    mysql.pool.query(current_query, (err, rows, fields) => {
+    mysql.pool.query(currentQuery, (err, rows, fields) => {
         if (err) {
             next(err);
             return;
         }
-        getAllData(current_query, res);
+        getAllData(currentQuery, res);
     });
 });
 
-app.get('/actors', function (req, res, next) {
-    // Select actors by ID here, easier to grab the most recent actor and update the table. Probably an easier way to do this.
-    var current_query = getActorsByID;
-    mysql.pool.query(current_query, (err, rows, fields) => {
-        if (err) {
-            next(err);
-            return;
-        }
-        getAllData(current_query, res);
-    });    
-})
+// app.get('/actors', function (req, res, next) {
+//     // Select actors by ID here, easier to grab the most recent actor and update the table. Probably an easier way to do this.
+//     var current_query = getActorsByID;
+//     mysql.pool.query(current_query, (err, rows, fields) => {
+//         if (err) {
+//             next(err);
+//             return;
+//         }
+//         getAllData(current_query, res);
+//     });    
+// })
 
-app.post('/', function (req, res) {
-    console.log(req);
+// insert
+app.post('/', function (req, res, next) {
+    //insert movie
+    if (req.body.table_name == 'movies') {
+        mysql.pool.query(insertMovieQuery,
+            [
+                req.body.title,
+                req.body.release_year,
+                req.body.director_id,
+                req.body.composer_id
+            ],
+            (err, result) => {
+                if (err) {
+                    next(err);
+                    return;
+                }
+                // send all data
+                getAllData(getMoviesQuery, res);
+            });
+    }
+
+    // insert director
     if (req.body.table_name == 'directors') {
-        var current_query = getMoviesQuery;
-        console.log("req tablename is equal to directors")
+        mysql.pool.query(insertDirectorQuery,
+            [
+                req.body.first_name,
+                req.body.last_name,
+            ],
+            (err, result) => {
+                if (err) {
+                    next(err);
+                    return;
+                }
+                // send all data
+                getAllData(getDirectorsQuery, res);
+            });
     }
 
-    sql = mysql.pool.query(insertActorQuery, [req.body.first_name, req.body.last_name], (err, result) => {
-        console.log("started");
-        if (err) {
-            res.write(JSON.stringify(error));
-            res.end();
-        }
-        else {
-            // redirect to the new /actors GET handler. Will grab new actors table after the insert and return to client.
-            // Probably a way to send back to the standard '/' GET handler, but unsure how to include req.header currently
-            res.redirect('/actors');
-        }
-    });
-});
-// insert row
-app.post('/add_actor', function (req, res) {
-    sql = mysql.pool.query(insertActorQuery, [req.body.first_name, req.body.last_name], (err, result) => {
-        console.log("started");
-        if (err) {
-            res.write(JSON.stringify(error));
-            res.end();
-        }
-        else{
-            // redirect to the new /actors GET handler. Will grab new actors table after the insert and return to client.
-            // Probably a way to send back to the standard '/' GET handler, but unsure how to include req.header currently
-            res.redirect('/actors');
-        }
-    });
-});
+    // insert composer
+    if (req.body.table_name == 'composers') {
+        mysql.pool.query(insertComposerQuery,
+            [
+                req.body.first_name,
+                req.body.last_name,
+            ],
+            (err, result) => {
+                if (err) {
+                    next(err);
+                    return;
+                }
+                // send all data
+                getAllData(getComposersQuery, res);
+            });
+    }
 
-// delete row
-app.delete('/', function (req, res, next) {
-    var context = {};
-    // http://url:19191?id=1 deletes row with id 1
-    mysql.pool.query(getAllQuery, (err, rows, fields) => {
-        if (err) {
-            next(err);
-            return;
-        }
-        // context.results = JSON.stringify(rows);
-    });
-
-    mysql.pool.query(deleteQuery, [req.query.id], (err, result) => {
-        if (err) {
-            next(err);
-            return;
-        }
-        // send all data back
-        getAllData(res);
-    });
+    // insert actor
+    if (req.body.table_name == 'actors') {
+        mysql.pool.query(insertActorQuery,
+            [
+                req.body.first_name,
+                req.body.last_name,
+            ],
+            (err, result) => {
+                if (err) {
+                    next(err);
+                    return;
+                }
+                // send all data
+                getAllData(getActorsQuery, res);
+            });
+    }
 });
+// // insert actor
+// app.post('/add_actor', function (req, res) {
+//     sql = mysql.pool.query(insertActorQuery, [req.body.first_name, req.body.last_name], (err, result) => {
+//         console.log("started");
+//         if (err) {
+//             res.write(JSON.stringify(error));
+//             res.end();
+//         }
+//         else {
+//             // redirect to the new /actors GET handler. Will grab new actors table after the insert and return to client.
+//             // Probably a way to send back to the standard '/' GET handler, but unsure how to include req.header currently
+//             res.redirect('/actors');
+//         }
+//     });
+// });
 
-// update existing row (replace)
+// update
 app.put('/', function (req, res, next) {
     var current_update_query;
 
-
-    // movies in body
+    // update movie
     if (req.body.table_name == 'movies') {
         mysql.pool.query(
             updateMoviesQuery,
-            [   
+            [
                 req.body.title,
-                req.body.release_year, 
-                req.body.director_id, 
-                req.body.composer_id, 
+                req.body.release_year,
+                req.body.director_id,
+                req.body.composer_id,
                 req.body.movie_id
             ],
             (err, result) => {
@@ -182,11 +225,11 @@ app.put('/', function (req, res, next) {
             });
     }
 
-    // directors in req body
+    // update director
     if (req.body.table_name == 'directors') {
         mysql.pool.query(
             updateDirectorsQuery,
-            [req.body.first_name, req.body.last_name, req.body.director_id], 
+            [req.body.first_name, req.body.last_name, req.body.director_id],
             (err, result) => {
                 if (err) {
                     next(err);
@@ -194,12 +237,12 @@ app.put('/', function (req, res, next) {
                 }
                 // send all data
                 getAllData(getDirectorsQuery, res);
-            });  
+            });
     }
 
-    // composers in req body
+    // update composers
     if (req.body.table_name == 'composers') {
-       //  var current_query = getComposersQuery;
+        //  var current_query = getComposersQuery;
         mysql.pool.query(
             updateComposersQuery,
             [req.body.first_name, req.body.last_name, req.body.composer_id],
@@ -210,10 +253,10 @@ app.put('/', function (req, res, next) {
                 }
                 // send all data
                 getAllData(getComposersQuery, res);
-            }); 
+            });
     }
 
-    // actors in get req body
+    // update actor
     if (req.body.table_name == 'actors') {
         // var current_query = getActorsQuery;
         mysql.pool.query(
@@ -228,18 +271,56 @@ app.put('/', function (req, res, next) {
                 getAllData(getActorsQuery, res);
             });
     }
-    
-    // mysql.pool.query(current_update_query,
-    //     [req.body.first_name, req.body.last_name, req.body.director_id], (err, result) => {
-    //         if (err) {
-    //             next(err);
-    //             return;
-    //         }
-    //         // send all data
-    //         // getAllData(res);
-    //     });
 });
 
+// delete
+app.delete('/', function (req, res, next) {
+    console.log(req.body);
+    // delete movie
+    if (req.body.table_name == "movies") {
+        mysql.pool.query(deleteMovieQuery, [req.body.movie_id], (err, rows, fields) => {
+            if (err) {
+                next(err);
+                return;
+            }
+            getAllData(getMoviesQuery, res)
+        });
+    }
+
+    // delete director
+    if (req.body.table_name == "directors") {
+        mysql.pool.query(deleteDirectorQuery, [req.body.director_id], (err, rows, fields) => {
+            if (err) {
+                next(err);
+                return;
+            }
+            getAllData(getDirectorsQuery, res)
+        });
+    }
+
+    // delete composer
+    if (req.body.table_name == "composers") {
+        mysql.pool.query(deleteComposerQuery, [req.body.composer_id], (err, rows, fields) => {
+            if (err) {
+                next(err);
+                return;
+            }
+            getAllData(getComposersQuery, res)
+        });
+    }
+
+    // delete actor
+    if (req.body.table_name == "actors") {
+        mysql.pool.query(deleteActorQuery, [req.body.actor_id], (err, rows, fields) => {
+            if (err) {
+                next(err);
+                return;
+            }
+            getAllData(getActorsQuery, res)
+        });
+    }
+
+});
 // reset and create
 app.get('/reset-table', function (req, res, next) {
     var context = {};

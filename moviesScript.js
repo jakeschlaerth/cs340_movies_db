@@ -13,7 +13,7 @@ req.onload = (e) => {
             var response = JSON.parse(req.responseText);
             var allRows = response.rows
             makeTable(allRows);
-
+            console.log(allRows);
         } else {
             console.log(baseURL)
             console.error(req.statusText);
@@ -131,6 +131,78 @@ const deleteTable = (allRows) => {
     }
 };
 
+// populates director drop down menu on forms
+getDirectors = (currentDir, selectInput) => {
+    var req = new XMLHttpRequest();
+    req.open("GET", baseURL, true);
+    req.setRequestHeader("table_name", "directors", false);    // set what table we are requesting
+    req.onload = (e) => {
+        if (req.readyState === 4) {
+            if (req.status === 200) {
+                // this is where the magic happens              
+                var response = JSON.parse(req.responseText);
+                var directorArray = response.rows;
+                // directorSelect = document.querySelector("#directorSelect");
+                var i;
+                for (i = 0; i < directorArray.length; i++) {
+                    dropdownOption = document.createElement("option");
+                    dropdownOption.innerHTML = `${directorArray[i].first_name} ${directorArray[i].last_name}`;
+                    dropdownOption.value = directorArray[i].director_id;
+                    // set default option
+                    if (`${directorArray[i].first_name} ${directorArray[i].last_name}` === currentDir) {
+                        dropdownOption.defaultSelected = true;
+                    }
+                    // append
+                    selectInput.appendChild(dropdownOption);
+                }
+            } else {
+                console.log(baseURL)
+                console.error(req.statusText);
+            }
+        }
+    };
+    req.send();
+}
+
+// populates composer dropdown menu
+getComposers = (currentCom, selectInput) => {
+    var req = new XMLHttpRequest();
+    req.open("GET", baseURL, true);
+    req.setRequestHeader("table_name", "composers", false);    // set what table we are requesting
+    req.onload = (e) => {
+        if (req.readyState === 4) {
+            if (req.status === 200) {
+                // this is where the magic happens              
+                var response = JSON.parse(req.responseText);
+                var composerArray = response.rows;
+                composerSelect = document.querySelector("#composerSelect");
+                var i;
+                for (i = 0; i < composerArray.length; i++) {
+                    dropdownOption = document.createElement("option");
+                    dropdownOption.innerHTML = `${composerArray[i].first_name} ${composerArray[i].last_name}`;
+                    dropdownOption.value = composerArray[i].composer_id;
+                    if (`${composerArray[i].first_name} ${composerArray[i].last_name}` === currentCom) {
+                        dropdownOption.defaultSelected = true;
+                    }
+
+                    // append
+                    selectInput.appendChild(dropdownOption);
+                }
+            } else {
+                console.log(baseURL)
+                console.error(req.statusText);
+            }
+        }
+    };
+    req.send();
+}
+
+addDirectorSelect = document.querySelector("#addDirectorSelect");
+addComposerSelect = document.querySelector("#addComposerSelect");
+// populate dropdowns in add movie form
+getDirectors(null, addDirectorSelect);
+getComposers(null, addComposerSelect);
+
 // submit row POST request, add row
 const newRowSubmit = document.getElementById('addMovieForm');
 newRowSubmit.addEventListener('submit', (e) => {
@@ -138,16 +210,15 @@ newRowSubmit.addEventListener('submit', (e) => {
     var req = new XMLHttpRequest();
     var payload = {
         title: null,
-        releaseYear: null,
-        director: null,
-        composer: null,
-        genres: null,
+        release_year: null,
+        director_id: null,
+        composer_id: null,
+        table_name: "movies"
     };
-    payload.name = document.getElementById("titleInput").value;
-    payload.releaseYear = document.getElementById("releaseYearInput").value;
-    payload.director = document.getElementById("directorInput").value;
-    payload.composer = document.getElementById("composerInput").value;
-    payload.genres = document.getElementById("genresInput").value;
+    payload.title = document.querySelector("#titleInput").value;
+    payload.release_year = document.getElementById("releaseYearInput").value;
+    payload.director_id = document.getElementById("addDirectorSelect").value;
+    payload.composer_id = document.getElementById("addComposerSelect").value;
 
     req.open("POST", baseURL, true);
     req.setRequestHeader('Content-Type', 'application/json');
@@ -156,6 +227,11 @@ newRowSubmit.addEventListener('submit', (e) => {
             if (req.status === 200) {
                 // this is where the magic happens
                 var response = JSON.parse(req.responseText);
+                allRows = response.rows;
+                // remove old table
+                deleteTable(allRows);
+                // rebuild from scratch
+                makeTable(allRows);
                 // return success or failure here
             } else {
                 console.error(req.statusText);
@@ -180,80 +256,14 @@ table.addEventListener('click', (event) => {
     // make table again
 });
 
-// populates director drop down menu on update form
-getDirectors = (currentDir) => {
-    var req = new XMLHttpRequest();
-    req.open("GET", baseURL, true);
-    req.setRequestHeader("table_name", "directors", false);    // set what table we are requesting
-    req.onload = (e) => {
-        if (req.readyState === 4) {
-            if (req.status === 200) {
-                // this is where the magic happens              
-                var response = JSON.parse(req.responseText);
-               var directorArray = response.rows;
-               directorSelect = document.querySelector("#directorSelect");
-               var i;
-               for (i=0; i < directorArray.length; i++)
-               {
-                    dropdownOption = document.createElement("option");
-                    dropdownOption.innerHTML = `${directorArray[i].first_name} ${directorArray[i].last_name}`;
-                    dropdownOption.value = directorArray[i].director_id;
-                    // set default option
-                    if (`${directorArray[i].first_name} ${directorArray[i].last_name}` === currentDir) {
-                       dropdownOption.defaultSelected = true;
-                   }
-                    // append
-                    directorSelect.appendChild(dropdownOption);
-               }
-               // find prev director
-                for (i = 0; i < directorArray.length; i++)
-                {
-
-                }
-               directorSelect.selected
-            } else {
-                console.log(baseURL)
-                console.error(req.statusText);
-            }
-        }
-    };
-    req.send();
-}
-
-// populates composer dropdown menu
-getComposers = (currentCom) => {
-    var req = new XMLHttpRequest();
-    req.open("GET", baseURL, true);
-    req.setRequestHeader("table_name", "composers", false);    // set what table we are requesting
-    req.onload = (e) => {
-        if (req.readyState === 4) {
-            if (req.status === 200) {
-                // this is where the magic happens              
-                var response = JSON.parse(req.responseText);
-                var composerArray = response.rows;
-                composerSelect = document.querySelector("#composerSelect");
-                var i;
-                for (i = 0; i < composerArray.length; i++) {
-                    dropdownOption = document.createElement("option");
-                    dropdownOption.innerHTML = `${composerArray[i].first_name} ${composerArray[i].last_name}`;
-                    dropdownOption.value = composerArray[i].composer_id;
-                    if (`${composerArray[i].first_name} ${composerArray[i].last_name}` === currentCom) {
-                        dropdownOption.defaultSelected = true;
-                    }
-
-                    // append
-                    composerSelect.appendChild(dropdownOption);
-                }
-            } else {
-                console.log(baseURL)
-                console.error(req.statusText);
-            }
-        }
-    };
-    req.send();
-}
-
+var updateBool = false;
 const onUpdate = (target) => {
+    if (updateBool == true)
+    {
+        alert("You are already updating a row!");
+        return;
+    }
+    updateBool = true;
     //              button cell       row
     var updateRow = target.parentNode.parentNode
 
@@ -264,16 +274,22 @@ const onUpdate = (target) => {
     updateHeader = document.createElement("h1");
     // text content of header
     updateHeader.innerHTML = "Update Form";
+
+    mainTableContainer = document.querySelector("mainTableContainer");
+
     // append header to body
     document.body.appendChild(updateHeader);
-
     // starts pointing at title field
     var currentElement = updateRow.firstElementChild.nextElementSibling;
     
+    // new fieldset
+    updateFieldset = document.createElement("fieldset");
     // new form
     updateForm = document.createElement("form");
-    // append form to document
-    document.body.appendChild(updateForm);
+    // append form to fieldset
+    updateFieldset.appendChild(updateForm);
+    // append fieldset to doc body
+    document.body.appendChild(updateFieldset);
 
     // title label
     var titleLabel = document.createElement("label");
@@ -300,7 +316,7 @@ const onUpdate = (target) => {
     var yearInput = document.createElement("input");
     // year field input type
     yearInput.setAttribute("type", "number");
-    // year of field
+    // name of field
     yearInput.name = "year";
     // year field old value
     yearInput.defaultValue = currentElement.innerText;
@@ -319,7 +335,8 @@ const onUpdate = (target) => {
     var directorSelect = document.createElement("select");
     directorSelect.id = "directorSelect";
     // populate dropdown
-    getDirectors(currentDir);
+
+    getDirectors(currentDir, directorSelect);
     // name of field
     directorSelect.name = "director";
     // append
@@ -337,7 +354,7 @@ const onUpdate = (target) => {
     var composerSelect = document.createElement("select");
     composerSelect.id = "composerSelect";
     // populate dropdown
-    getComposers(currentCom);
+    getComposers(currentCom, composerSelect);
     // name of field
     composerSelect.name = "composer";
     // composer field old value
@@ -345,13 +362,7 @@ const onUpdate = (target) => {
     // append
     composerLabel.appendChild(composerSelect);
     updateForm.appendChild(composerLabel);
-    
 
-    // iterate through siblings
-    currentElement = currentElement.nextElementSibling;
-
-
-   
     // submit button
     var updateSubmit = document.createElement("input");
     updateSubmit.setAttribute("type", "submit");
@@ -383,6 +394,7 @@ const onUpdate = (target) => {
                     deleteTable(allRows);
                     // rebuild from scratch
                     makeTable(allRows);
+                    updateBool = false;
 
                 } else {
                     console.error(req.statusText);
@@ -391,6 +403,35 @@ const onUpdate = (target) => {
         }
         req.send(JSON.stringify(payload));
         updateHeader.remove();
-        updateForm.remove();
+        updateFieldset.remove();
     });
+};
+
+const onDelete = (target) => {
+    //             button cell       row        id cell           id value
+    var deleteID = target.parentNode.parentNode.firstElementChild.innerHTML;
+    var req = new XMLHttpRequest();
+    var payload = {
+        movie_id: null,
+        table_name: "movies"
+    };
+    payload.movie_id = deleteID;
+    req.open("DELETE", baseURL, true);
+    req.setRequestHeader('Content-Type', 'application/json');
+    req.onload = (e) => {
+        if (req.readyState === 4) {
+            if (req.status === 200) {
+                // this is where the magic happens
+                var response = JSON.parse(req.responseText);
+                allRows = response.rows;
+                // remove old table
+                deleteTable(allRows);
+                // rebuild from scratch
+                makeTable(allRows);
+            } else {
+                console.error(req.statusText);
+            }
+        }
+    }
+    req.send(JSON.stringify(payload));
 };

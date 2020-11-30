@@ -115,25 +115,18 @@ const deleteTable = (allRows) => {
     }
 };
 
-
 // submit row POST request, add row
 const newRowSubmit = document.getElementById('addComposerForm');
 newRowSubmit.addEventListener('submit', (e) => {
     e.preventDefault();
     var req = new XMLHttpRequest();
     var payload = {
-        title: null,
-        releaseYear: null,
-        director: null,
-        composer: null,
-        genres: null,
+        first_name: null,
+        last_name: null,
+        table_name: "composers"
     };
-    payload.name = document.getElementById("titleInput").value;
-    payload.releaseYear = document.getElementById("releaseYearInput").value;
-    payload.director = document.getElementById("directorInput").value;
-    payload.composer = document.getElementById("composerInput").value;
-    payload.genres = document.getElementById("genresInput").value;
-
+    payload.first_name = document.getElementById("firstNameInput").value;
+    payload.last_name = document.getElementById("lastNameInput").value;
     req.open("POST", baseURL, true);
     req.setRequestHeader('Content-Type', 'application/json');
     req.onload = (e) => {
@@ -141,6 +134,11 @@ newRowSubmit.addEventListener('submit', (e) => {
             if (req.status === 200) {
                 // this is where the magic happens
                 var response = JSON.parse(req.responseText);
+                allRows = response.rows;
+                // remove old table
+                deleteTable(allRows);
+                // rebuild from scratch
+                makeTable(allRows);
                 // return success or failure here
             } else {
                 console.error(req.statusText);
@@ -152,20 +150,23 @@ newRowSubmit.addEventListener('submit', (e) => {
 
 table.addEventListener('click', (event) => {
     let target = event.target;
+    // if it is an update button, send a PUT request to the server
     if (target.id == "updateButton") {
         onUpdate(target);
     };
+    // if it is a delete button, send a delete request to the server
     if (target.id == "deleteButton") {
         onDelete(target)
     };
-    // if it is an update button, send a PUT request to the server
-    // if it is a delete button, send a delete request to the server
-
-    // delete table
-    // make table again
 });
 
+var updateBool = false; 
 const onUpdate = (target) => {
+    if (updateBool == true) {
+        alert("You are already updating a row!");
+        return;
+    }
+    updateBool = true;
     //              button cell       row
     var updateRow = target.parentNode.parentNode
     //             button cell       row        id cell           id value
@@ -230,7 +231,6 @@ const onUpdate = (target) => {
         e.preventDefault();
 
         var req = new XMLHttpRequest();
-        var updateURL = baseURL;
         var payload = {
             first_name: first_name_input.value,
             last_name: last_name_input.value,
@@ -249,7 +249,7 @@ const onUpdate = (target) => {
                     deleteTable(allRows);
                     // rebuild from scratch
                     makeTable(allRows);
-
+                    updateBool = false;
                 } else {
                     console.error(req.statusText);
                 }

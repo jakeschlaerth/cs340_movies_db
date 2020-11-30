@@ -12,7 +12,6 @@ req.onload = (e) => {
         if (req.status === 200) {
             var response = JSON.parse(req.responseText);
             var allRows = response.rows
-            console.log(response);
             makeTable(allRows);
 
         } else {
@@ -116,7 +115,6 @@ const deleteTable = (allRows) => {
     }
 };
 
-
 // submit row POST request, add row
 const newRowSubmit = document.getElementById('addActorForm');
 newRowSubmit.addEventListener('submit', (e) => {
@@ -125,48 +123,50 @@ newRowSubmit.addEventListener('submit', (e) => {
     var payload = {
         first_name: null,
         last_name: null,
+        table_name: "actors"
     };
     payload.first_name = document.getElementById("firstNameInput").value;
     payload.last_name = document.getElementById("lastNameInput").value;
-
     req.open("POST", baseURL, true);
     req.setRequestHeader('Content-Type', 'application/json');
     req.onload = (e) => {
         if (req.readyState === 4) {
             if (req.status === 200) {
                 // this is where the magic happens
-                console.log(req.responseText);
                 var response = JSON.parse(req.responseText);
-                var allRows = response.rows;
-                var newActorIndex = allRows.length - 1;
-                var newRow = allRows[newActorIndex];
-                makeRow(newRow, table);
+                allRows = response.rows;
+                // remove old table
+                deleteTable(allRows);
+                // rebuild from scratch
+                makeTable(allRows);
                 // return success or failure here
             } else {
                 console.error(req.statusText);
             }
         }
     };
-    console.log(payload.first_name + "  " + payload.last_name);
     req.send(JSON.stringify(payload));
 });
 
 table.addEventListener('click', (event) => {
     let target = event.target;
+    // if it is an update button, send a PUT request to the server
     if (target.id == "updateButton") {
         onUpdate(target);
     };
+    // if it is a delete button, send a delete request to the server
     if (target.id == "deleteButton") {
         onDelete(target)
     };
-    // if it is an update button, send a PUT request to the server
-    // if it is a delete button, send a delete request to the server
+});  
 
-    // delete table
-    // make table again
-});
-
+var updateBool = false; 
 const onUpdate = (target) => {
+    if (updateBool == true) {
+        alert("You are already updating a row!");
+        return;
+    }
+    updateBool = true;
     //              button cell       row
     var updateRow = target.parentNode.parentNode
     //             button cell       row        id cell           id value
@@ -250,7 +250,7 @@ const onUpdate = (target) => {
                     deleteTable(allRows);
                     // rebuild from scratch
                     makeTable(allRows);
-
+                    updateBool = false;
                 } else {
                     console.error(req.statusText);
                 }

@@ -122,17 +122,12 @@ newRowSubmit.addEventListener('submit', (e) => {
     e.preventDefault();
     var req = new XMLHttpRequest();
     var payload = {
-        title: null,
-        releaseYear: null,
-        director: null,
-        composer: null,
-        genres: null,
+        first_name: null,
+        last_name: null,
+        table_name: "directors"
     };
-    payload.name = document.getElementById("titleInput").value;
-    payload.releaseYear = document.getElementById("releaseYearInput").value;
-    payload.director = document.getElementById("directorInput").value;
-    payload.composer = document.getElementById("composerInput").value;
-    payload.genres = document.getElementById("genresInput").value;
+    payload.first_name = document.getElementById("firstNameInput").value;
+    payload.last_name = document.getElementById("lastNameInput").value;
 
     req.open("POST", baseURL, true);
     req.setRequestHeader('Content-Type', 'application/json');
@@ -141,6 +136,11 @@ newRowSubmit.addEventListener('submit', (e) => {
             if (req.status === 200) {
                 // this is where the magic happens
                 var response = JSON.parse(req.responseText);
+                allRows = response.rows;
+                // remove old table
+                deleteTable(allRows);
+                // rebuild from scratch
+                makeTable(allRows);
                 // return success or failure here
             } else {
                 console.error(req.statusText);
@@ -165,7 +165,13 @@ table.addEventListener('click', (event) => {
     // make table again
 });
 
+var updateBool = false;
 const onUpdate = (target) => {
+    if (updateBool == true) {
+        alert("You are already updating a row!");
+        return;
+    }
+    updateBool = true;
     //              button cell       row
     var updateRow = target.parentNode.parentNode
     //             button cell       row        id cell           id value
@@ -249,6 +255,7 @@ const onUpdate = (target) => {
                     deleteTable(allRows);
                     // rebuild from scratch
                     makeTable(allRows);
+                    updateBool = false;
 
                 } else {
                     console.error(req.statusText);
@@ -259,4 +266,33 @@ const onUpdate = (target) => {
         updateHeader.remove();
         updateForm.remove();
     });
+};
+
+const onDelete = (target) => {
+    //             button cell       row        id cell           id value
+    var deleteID = target.parentNode.parentNode.firstElementChild.innerHTML;
+    var req = new XMLHttpRequest();
+    var payload = {
+        director_id: deleteID,
+        table_name: "directors"
+    };
+    req.open("DELETE", baseURL, true);
+    req.setRequestHeader('Content-Type', 'application/json');
+    req.onload = (e) => {
+        if (req.readyState === 4) {
+            if (req.status === 200) {
+                // this is where the magic happens
+                var response = JSON.parse(req.responseText);
+                allRows = response.rows;
+                console.log(allRows)
+                // remove old table
+                deleteTable(allRows);
+                // rebuild from scratch
+                makeTable(allRows);
+            } else {
+                console.error(req.statusText);
+            }
+        }
+    }
+    req.send(JSON.stringify(payload));
 };

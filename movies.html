@@ -24,27 +24,28 @@
             </li>
         </ul>
     </nav>
-
-    <table id="moviesTable">
-        <tr>
-            <th style="visibility:hidden;">id</th>
-            <th>title</th>
-            <th>year</th>
-            <th>director</th>
-            <th>composer</th>
-            <th></th>
-            <th></th>
-            <th></th>
-            <th></th>
-        </tr>
-    </table>
+    <div id="mainTableContainer">
+        <table id="moviesTable">
+            <tr>
+                <th style="visibility:hidden;">id</th>
+                <th>title</th>
+                <th>year</th>
+                <th>director</th>
+                <th>composer</th>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th></th>
+            </tr>
+        </table>
+    </div>
 
     <h1>Add New Movie</h1>
     <form method="POST" id="addMovieForm">
         <fieldset>
             <label>
                 Movie Title:
-                <input type="text" name="title" id="titleInput"/>
+                <input type="text" name="title" id="titleInput" />
             </label>
             <label>
                 Year Released:
@@ -53,17 +54,15 @@
             </label>
             <label>
                 Director:
-                <input type="text" name="director" id="directorInput" />
+                <select name="director" id="addDirectorSelect">
+                </select>
             </label>
             <label>
                 Composer:
-                <input type="text" name="composer" id="composerInput" />
+                <select name="composer" id="addComposerSelect">
+                    </select>
             </label>
-            <label>
-                Genres (seperate values with commas):
-                <input type="text" name="genre" id="genresInput" />
-            </label>
-            <input type="submit" value="submit" id="newMovieSubmit" />
+            <input type="submit" value="submit"/>
         </fieldset>
     </form>
 
