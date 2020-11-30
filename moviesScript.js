@@ -44,7 +44,7 @@ const makeRow = (currentRow, table) => {
     // new cell
     var idCell = document.createElement("td");
     // new cell text
-    var idCellText = document.createTextNode(currentRow.movieID);
+    var idCellText = document.createTextNode(currentRow.movie_id);
     // hide cell
     idCell.style.visibility = "hidden";
     // append text to cell
@@ -154,3 +154,164 @@ newRowSubmit.addEventListener('submit', (e) => {
     };
     req.send(JSON.stringify(payload));
 });
+
+table.addEventListener('click', (event) => {
+    let target = event.target;
+    if (target.id == "updateButton") {
+        onUpdate(target);
+    };
+    if (target.id == "deleteButton") {
+        onDelete(target)
+    };
+    // if it is an update button, send a PUT request to the server
+    // if it is a delete button, send a delete request to the server
+
+    // delete table
+    // make table again
+});
+
+const onUpdate = (target) => {
+    //              button cell       row
+    var updateRow = target.parentNode.parentNode
+
+    //             button cell       row        id cell           id value
+    var updateID = target.parentNode.parentNode.firstElementChild.innerHTML;
+
+    // new header
+    updateHeader = document.createElement("h1");
+    // text content of header
+    updateHeader.innerHTML = "Update Form";
+    // append header to body
+    document.body.appendChild(updateHeader);
+
+    // starts pointing at title field
+    var currentElement = updateRow.firstElementChild.nextElementSibling;
+    
+    // new form
+    updateForm = document.createElement("form");
+    // append form to document
+    document.body.appendChild(updateForm);
+
+    // title label
+    var titleLabel = document.createElement("label");
+    titleLabel.innerText = "title:"
+    // title field
+    var titleInput = document.createElement("input");
+    // title field input type
+    titleInput.setAttribute("type", "text");
+    // title of field
+    titleInput.title = "title";
+    // title field old value
+    titleInput.defaultValue = currentElement.innerText;
+    // append
+    titleLabel.appendChild(titleInput);
+    updateForm.appendChild(titleLabel);
+
+    // iterate through siblings
+    currentElement = currentElement.nextElementSibling;
+
+    // year label
+    var yearLabel = document.createElement("label");
+    yearLabel.innerText = "year:"
+    // year field
+    var yearInput = document.createElement("input");
+    // year field input type
+    yearInput.setAttribute("type", "number");
+    // year of field
+    yearInput.year = "year";
+    // year field old value
+    yearInput.defaultValue = currentElement.innerText;
+    // append
+    yearLabel.appendChild(yearInput);
+    updateForm.appendChild(yearLabel);
+
+    // iterate through siblings
+    currentElement = currentElement.nextElementSibling;
+
+    // director label
+    var directorLabel = document.createElement("label");
+    directorLabel.innerText = "director:"
+    // director field
+    var directorInput = document.createElement("input");
+    // director field input type
+    directorInput.setAttribute("type", "text");
+    // director of field
+    directorInput.director = "director";
+    // director field old value
+    directorInput.defaultValue = currentElement.innerText;
+    // append
+    directorLabel.appendChild(directorInput);
+    updateForm.appendChild(directorLabel);
+
+    // iterate through siblings
+    currentElement = currentElement.nextElementSibling;
+
+    // composer label
+    var composerLabel = document.createElement("label");
+    composerLabel.innerText = "composer:"
+    // composer field
+    var composerInput = document.createElement("input");
+    // composer field input type
+    composerInput.setAttribute("type", "text");
+    // composer of field
+    composerInput.composer = "composer";
+    // composer field old value
+    composerInput.defaultValue = currentElement.innerText;
+    // append
+    composerLabel.appendChild(composerInput);
+    updateForm.appendChild(composerLabel);
+    
+
+    // iterate through siblings
+    currentElement = currentElement.nextElementSibling;
+
+    // submit button
+    var updateSubmit = document.createElement("input");
+    updateSubmit.setAttribute("type", "submit");
+    updateSubmit.value = "submit";
+    // append
+    updateForm.appendChild(updateSubmit);
+
+    updateSubmit.addEventListener('click', (e) => {
+        e.preventDefault();
+
+        var req = new XMLHttpRequest();
+        var updateURL = baseURL;
+        var payload = {
+            name: nameInput.value,
+            reps: repsInput.value,
+            weight: weightInput.value,
+            unit: null,
+            date: dateInput.value,
+            id: updateID
+        };
+        // unit radio selctor value
+        if (lbsInput.checked) {
+            payload.unit = 0;
+        };
+        if (kgInput.checked) {
+            payload.unit = 1;
+        };
+        req.open("PUT", baseURL, true);
+        req.setRequestHeader('Content-Type', 'application/json');
+        req.onload = (e) => {
+            if (req.readyState === 4) {
+                if (req.status === 200) {
+                    // this is where the magic happens
+                    var response = JSON.parse(req.responseText);
+                    allRows = response.rows;
+                    // remove old table
+                    deleteTable(allRows);
+                    // rebuild from scratch
+                    makeTable(allRows);
+
+                } else {
+                    console.error(req.statusText);
+                }
+            }
+        }
+        req.send(JSON.stringify(payload));
+        updateHeader.remove();
+        updateForm.remove();
+    });
+};

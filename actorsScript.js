@@ -1,4 +1,4 @@
-const baseURL = `http://localhost:22222`;
+const baseURL = `http://localhost:19191`;
 //const baseURL =  `http://flip3.engr.oregonstate.edu:19191` // (or wherever you run the server) when live  
 // `http://localhost:19191` when local
 
@@ -103,6 +103,19 @@ const makeCell = (data, row) => {
     row.appendChild(cell);
 };
 
+// delete all entries in table
+const deleteTable = (allRows) => {
+    // set
+    currentDataRow = table.firstElementChild.firstElementChild;
+    while (true) {
+        if (currentDataRow.nextElementSibling == null) {
+            currentDataRow.remove();
+            break;
+        }
+        currentDataRow.nextElementSibling.remove();
+    }
+};
+
 
 // submit row POST request, add row
 const newRowSubmit = document.getElementById('addActorForm');
@@ -116,7 +129,7 @@ newRowSubmit.addEventListener('submit', (e) => {
     payload.first_name = document.getElementById("firstNameInput").value;
     payload.last_name = document.getElementById("lastNameInput").value;
 
-    req.open("POST", `http://localhost:22222/add_actor`, true);
+    req.open("POST", baseURL, true);
     req.setRequestHeader('Content-Type', 'application/json');
     req.onload = (e) => {
         if (req.readyState === 4) {
@@ -124,7 +137,7 @@ newRowSubmit.addEventListener('submit', (e) => {
                 // this is where the magic happens
                 console.log(req.responseText);
                 var response = JSON.parse(req.responseText);
-                var allRows = response.rows
+                var allRows = response.rows;
                 var newActorIndex = allRows.length - 1;
                 var newRow = allRows[newActorIndex];
                 makeRow(newRow, table);
@@ -137,3 +150,114 @@ newRowSubmit.addEventListener('submit', (e) => {
     console.log(payload.first_name + "  " + payload.last_name);
     req.send(JSON.stringify(payload));
 });
+
+table.addEventListener('click', (event) => {
+    let target = event.target;
+    if (target.id == "updateButton") {
+        onUpdate(target);
+    };
+    if (target.id == "deleteButton") {
+        onDelete(target)
+    };
+    // if it is an update button, send a PUT request to the server
+    // if it is a delete button, send a delete request to the server
+
+    // delete table
+    // make table again
+});
+
+const onUpdate = (target) => {
+    //              button cell       row
+    var updateRow = target.parentNode.parentNode
+    //             button cell       row        id cell           id value
+    var updateID = target.parentNode.parentNode.firstElementChild.innerHTML;
+
+    // new header
+    updateHeader = document.createElement("h1");
+    // text content of header
+    updateHeader.innerHTML = "Update Form";
+    // append header to body
+    document.body.appendChild(updateHeader);
+
+    // starts pointing at first_name field
+    var currentElement = updateRow.firstElementChild.nextElementSibling;
+
+    // new form
+    updateForm = document.createElement("form");
+    // append form to document
+    document.body.appendChild(updateForm);
+
+    // first_name label
+    var first_name_label = document.createElement("label");
+    first_name_label.innerText = "first name:"
+    // first_name field
+    var first_name_input = document.createElement("input");
+    // first_name field input type
+    first_name_input.setAttribute("type", "text");
+    // first_name of field
+    first_name_input.first_name = "first_name";
+    // first_name field old value
+    first_name_input.defaultValue = currentElement.innerText;
+    // append
+    first_name_label.appendChild(first_name_input);
+    updateForm.appendChild(first_name_label);
+
+    // iterate through siblings
+    currentElement = currentElement.nextElementSibling;
+
+    // last_name label
+    var last_name_label = document.createElement("label");
+    last_name_label.innerText = "last name:"
+    // last_name field
+    var last_name_input = document.createElement("input");
+    // last_name field input type
+    last_name_input.setAttribute("type", "text");
+    // last_name of field
+    last_name_input.last_name = "last_name";
+    // last_name field old value
+    last_name_input.defaultValue = currentElement.innerText;
+    // append
+    last_name_label.appendChild(last_name_input);
+    updateForm.appendChild(last_name_label);
+
+    // submit button
+    var updateSubmit = document.createElement("input");
+    updateSubmit.setAttribute("type", "submit");
+    updateSubmit.value = "submit";
+    // append
+    updateForm.appendChild(updateSubmit);
+
+    updateSubmit.addEventListener('click', (e) => {
+        e.preventDefault();
+
+        var req = new XMLHttpRequest();
+        var updateURL = baseURL;
+        var payload = {
+            first_name: first_name_input.value,
+            last_name: last_name_input.value,
+            actor_id: updateID,
+            table_name: "actors"
+        };
+        req.open("PUT", baseURL, true);
+        req.setRequestHeader('Content-Type', 'application/json');
+        req.onload = (e) => {
+            if (req.readyState === 4) {
+                if (req.status === 200) {
+                    // this is where the magic happens
+                    var response = JSON.parse(req.responseText);
+                    allRows = response.rows;
+                    // remove old table
+                    deleteTable(allRows);
+                    // rebuild from scratch
+                    makeTable(allRows);
+
+                } else {
+                    console.error(req.statusText);
+                }
+            }
+        }
+        req.send(JSON.stringify(payload));
+        updateHeader.remove();
+        updateForm.remove();
+    });
+};
