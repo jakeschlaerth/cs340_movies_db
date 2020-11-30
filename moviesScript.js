@@ -1,5 +1,5 @@
 const baseURL = `http://localhost:19191`;  
-//const baseURL = `http://flip3.engr.oregonstate.edu:19191` // (or wherever you run the server) when live  
+// const baseURL = `http://flip1.engr.oregonstate.edu:19191` // (or wherever you run the server) when live  
 // `http://localhost:19191` when local
 
 // basic get request, builds table
@@ -120,7 +120,6 @@ const makeCell = (data, row) => {
 };
 
 const deleteTable = (allRows) => {
-    // set
     currentDataRow = table.firstElementChild.firstElementChild. nextElementSibling;
     while (true) {
         if (currentDataRow.nextElementSibling == null) {

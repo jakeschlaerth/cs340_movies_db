@@ -260,3 +260,32 @@ const onUpdate = (target) => {
         updateForm.remove();
     });
 };
+
+const onDelete = (target) => {
+    //             button cell       row        id cell           id value
+    var deleteID = target.parentNode.parentNode.firstElementChild.innerHTML;
+    var req = new XMLHttpRequest();
+    var payload = {
+        composer_id: deleteID,
+        table_name: "composers"
+    };
+    req.open("DELETE", baseURL, true);
+    req.setRequestHeader('Content-Type', 'application/json');
+    req.onload = (e) => {
+        if (req.readyState === 4) {
+            if (req.status === 200) {
+                // this is where the magic happens
+                var response = JSON.parse(req.responseText);
+                allRows = response.rows;
+                console.log(allRows)
+                // remove old table
+                deleteTable(allRows);
+                // rebuild from scratch
+                makeTable(allRows);
+            } else {
+                console.error(req.statusText);
+            }
+        }
+    }
+    req.send(JSON.stringify(payload));
+};
