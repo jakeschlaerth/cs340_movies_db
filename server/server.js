@@ -39,6 +39,7 @@ const getComposersQuery = 'SELECT composer_id, first_name, last_name FROM compos
 const getActorsQuery = 'SELECT actor_id, first_name, last_name FROM actors ORDER BY last_name;';
 const getActorsByID = 'SELECT actor_id, first_name, last_name FROM actors ORDER BY actor_id;';
 
+const updateMoviesQuery = 'UPDATE movies SET title=?, release_year=?, director_id=?, composer_id=? WHERE movie_id=?'
 const updateDirectorsQuery = 'UPDATE directors SET first_name=?, last_name=? WHERE director_id=?'
 const updateComposersQuery = 'UPDATE composers SET first_name=?, last_name=? WHERE composer_id=?'
 const updateActorsQuery = 'UPDATE actors SET first_name=?, last_name=? WHERE actor_id=?'
@@ -52,8 +53,6 @@ const getAllData = (current_query, res) => {
         res.json({ rows: rows });
     });
 };
-
-
 
 // get all data
 app.get('/', function (req, res, next) {
@@ -164,7 +163,23 @@ app.put('/', function (req, res, next) {
 
     // movies in body
     if (req.body.table_name == 'movies') {
-        // var current_query = getMoviesQuery;
+        mysql.pool.query(
+            updateMoviesQuery,
+            [   
+                req.body.title,
+                req.body.release_year, 
+                req.body.director_id, 
+                req.body.composer_id, 
+                req.body.movie_id
+            ],
+            (err, result) => {
+                if (err) {
+                    next(err);
+                    return;
+                }
+                // send all data
+                getAllData(getMoviesQuery, res);
+            });
     }
 
     // directors in req body
