@@ -13,7 +13,9 @@ const getMoviesQuery = `SELECT
                     title, 
                     release_year, 
                     CONCAT(directors.first_name, ' ', directors.last_name) AS director, 
-                    CONCAT(composers.first_name, ' ', composers.last_name) AS composer 
+                    CONCAT(composers.first_name, ' ', composers.last_name) AS composer, 
+                    movies.director_id,
+                    movies.composer_id
                     FROM movies
                     INNER JOIN directors ON movies.director_id = directors.director_id
                     INNER JOIN composers ON movies.composer_id = composers.composer_id
@@ -275,8 +277,9 @@ app.put('/', function (req, res, next) {
 
 // delete
 app.delete('/', function (req, res, next) {
-    console.log(req.body);
+    // console.log(req.body);
     // delete movie
+    // we can freely delete movies
     if (req.body.table_name == "movies") {
         mysql.pool.query(deleteMovieQuery, [req.body.movie_id], (err, rows, fields) => {
             if (err) {
@@ -287,6 +290,7 @@ app.delete('/', function (req, res, next) {
         });
     }
 
+    const directorQuery = `SELECT title FROM movies WHERE director_id=?`;
     // delete director
     if (req.body.table_name == "directors") {
         mysql.pool.query(deleteDirectorQuery, [req.body.director_id], (err, rows, fields) => {
@@ -320,16 +324,6 @@ app.delete('/', function (req, res, next) {
         });
     }
 
-});
-// reset and create
-app.get('/reset-table', function (req, res, next) {
-    var context = {};
-    mysql.pool.query(dropTableQuery, function (err) {
-        mysql.pool.query(makeTableQuery, function (err) {
-            context.results = "Table reset";
-            res.send(context);
-        })
-    });
 });
 
 app.use(function (req, res) {

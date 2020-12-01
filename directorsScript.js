@@ -106,8 +106,7 @@ const deleteTable = (allRows) => {
     // set
     currentDataRow = table.firstElementChild.firstElementChild;
     while (true) {
-        if (currentDataRow.nextElementSibling == null)
-        {
+        if (currentDataRow.nextElementSibling == null) {
             currentDataRow.remove();
             break;
         }
@@ -276,15 +275,50 @@ const onDelete = (target) => {
         director_id: deleteID,
         table_name: "directors"
     };
-    req.open("DELETE", baseURL, true);
-    req.setRequestHeader('Content-Type', 'application/json');
+
+    var fkConflict = false;
+    // can this director be deleted?
+    req.open("GET", baseURL, true);
+    req.setRequestHeader("table_name", "movies", false);    // set what table we are requesting
     req.onload = (e) => {
         if (req.readyState === 4) {
             if (req.status === 200) {
-                // this is where the magic happens
                 var response = JSON.parse(req.responseText);
+                var allRows = response.rows
+                // iterate through all movies, check for deleteID in director_id
+                var i;
+                for (i = 0; i < allRows.length; i++) {
+                    if (allRows[i].director_id == deleteID) {
+                        alert(`Sorry, ${allRows[i].director} cannot be deleted while listed as the director of ${allRows[i].title}`);
+                        fkConflict = true;
+                    }
+                }
+                if (!fkConflict) {
+                    sendDeleteRequest(deleteID);
+                }
+            } else {
+                console.log(baseURL)
+                console.error(req.statusText);
+            }
+        }
+    };
+    req.send();
+};
+
+sendDeleteRequest = (deleteID) => {
+    var del_req = new XMLHttpRequest();
+    var payload = {
+        director_id: deleteID,
+        table_name: "directors"
+    };
+    del_req.open("DELETE", baseURL, true);
+    del_req.setRequestHeader('Content-Type', 'application/json');
+    del_req.onload = (e) => {
+        if (del_req.readyState === 4) {
+            if (del_req.status === 200) {
+                // this is where the magic happens
+                var response = JSON.parse(del_req.responseText);
                 allRows = response.rows;
-                console.log(allRows)
                 // remove old table
                 deleteTable(allRows);
                 // rebuild from scratch
@@ -294,5 +328,5 @@ const onDelete = (target) => {
             }
         }
     }
-    req.send(JSON.stringify(payload));
-};
+   del_req.send(JSON.stringify(payload));
+}
