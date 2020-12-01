@@ -1,5 +1,5 @@
 var express = require('express');
-var mysql = require('../dbcon.js');
+var mysql = require('./dbcon.js');
 var CORS = require('cors');
 
 var app = express();
@@ -8,69 +8,81 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(CORS());
 
-const getMoviesQuery = `SELECT 
-                    movie_id,
-                    title, 
-                    release_year, 
-                    CONCAT(directors.first_name, ' ', directors.last_name) AS director, 
-                    CONCAT(composers.first_name, ' ', composers.last_name) AS composer, 
-                    movies.director_id,
-                    movies.composer_id
-                    FROM movies
-                    INNER JOIN directors ON movies.director_id = directors.director_id
-                    INNER JOIN composers ON movies.composer_id = composers.composer_id
-                    ORDER BY release_year;`;
+const getMoviesQuery =  `SELECT 
+                        movie_id,
+                        title, 
+                        release_year, 
+                        CONCAT(directors.first_name, ' ', directors.last_name) AS director, 
+                        CONCAT(composers.first_name, ' ', composers.last_name) AS composer, 
+                        movies.director_id,
+                        movies.composer_id
+                        FROM movies
+                        INNER JOIN directors ON movies.director_id = directors.director_id
+                        INNER JOIN composers ON movies.composer_id = composers.composer_id
+                        ORDER BY release_year DESC;`;
 
-const getDirectorsQuery = 'SELECT director_id, first_name, last_name FROM directors ORDER BY last_name;';
-
-const getComposersQuery = 'SELECT composer_id, first_name, last_name FROM composers ORDER BY last_name;';
-
+const getDirectorsQuery =   `SELECT director_id, 
+                            first_name, 
+                            last_name 
+                            FROM directors 
+                            ORDER BY last_name;`;
+const getComposersQuery =   `SELECT composer_id, 
+                            first_name, 
+                            last_name 
+                            FROM composers 
+                            ORDER BY last_name;`;
 const getActorsQuery = 'SELECT actor_id, first_name, last_name FROM actors ORDER BY last_name;';
-
+const getGenresQuery = `SELECT genre_id, name FROM genres ORDER BY genre_id;`;
 const getPerformancesQuery =    `SELECT 
                                 CONCAT(actors.first_name, ' ', actors.last_name) AS actor,
-                                movies.title AS title
+                                movies.title AS title,
+                                performances.actor_id AS actor_id,
+                                performances.movie_id AS movie_id
                                 FROM performances
                                 INNER JOIN actors ON performances.actor_id=actors.actor_id
-                                INNER JOIN movies ON performances.movie_id=movies.movie_id`;
-                                
-const getGenreInstancesQuery = `SELECT title, name 
-                            FROM genre_instances
-                            INNER JOIN genres on genre_instances.genre_id = genres.genre_id
-                            INNER JOIN movies on genre_instances.movie_id = movies.movie_id`;
+                                INNER JOIN movies ON performances.movie_id=movies.movie_id
+                                ORDER BY title;`;
+const getGenreInstancesQuery =  `SELECT 
+                                title, 
+                                name, 
+                                genre_instances.movie_id, 
+                                genre_instances.genre_id 
+                                FROM genre_instances
+                                INNER JOIN genres on genre_instances.genre_id = genres.genre_id
+                                INNER JOIN movies on genre_instances.movie_id = movies.movie_id`;
 
-const insertMovieQuery = `INSERT INTO movies 
-                            (title, release_year, director_id, composer_id) 
-                            VALUES (?, ?, ?, ?)`;
-
-const insertDirectorQuery = `INSERT INTO directors
+const insertMovieQuery =        `INSERT INTO movies 
+                                (title, release_year, director_id, composer_id) 
+                                VALUES (?, ?, ?, ?)`;
+const insertDirectorQuery =     `INSERT INTO directors
                                 (first_name, last_name)
                                 VALUES (?, ?)`;
-
-const insertComposerQuery = `INSERT INTO composers
+const insertComposerQuery =     `INSERT INTO composers
                                 (first_name, last_name)
                                 VALUES (?, ?)`;
+const insertActorQuery =        `INSERT INTO actors (first_name, last_name) VALUES (?, ?)`;
+const insertGenreQuery =        `INSERT INTO genres (name) VALUES (?);`;
+const insertPerformanceQuery =  `INSERT INTO performances
+                                (actor_id, movie_id)
+                                VALUE (?, ?)`
 
-const insertActorQuery = "INSERT INTO actors (`first_name`, `last_name`) VALUES (?, ?)";
-
-// const makeTableQuery = `CREATE TABLE movies(
-//                         id INT PRIMARY KEY AUTO_INCREMENT, 
-//                         title VARCHAR(255) NOT NULL,
-//                         release_year INT,
-//                         director_id INT,
-//                         composer_id INT);`;
-
-const getActorsByID = 'SELECT actor_id, first_name, last_name FROM actors ORDER BY actor_id;';
-
-const updateMoviesQuery = 'UPDATE movies SET title=?, release_year=?, director_id=?, composer_id=? WHERE movie_id=?;';
+const updateMoviesQuery =       `UPDATE movies 
+                                SET title=?, 
+                                release_year=?, 
+                                director_id=?, 
+                                composer_id=? 
+                                WHERE movie_id=?;`;
 const updateDirectorsQuery = 'UPDATE directors SET first_name=?, last_name=? WHERE director_id=?;';
 const updateComposersQuery = 'UPDATE composers SET first_name=?, last_name=? WHERE composer_id=?;'
 const updateActorsQuery = 'UPDATE actors SET first_name=?, last_name=? WHERE actor_id=?;';
+const updateGenresQuery = `UPDATE genres SET name=? WHERE genre_id=?;`;
 
 const deleteMovieQuery = `DELETE FROM movies WHERE movie_id=?;`;
 const deleteDirectorQuery = `DELETE FROM directors WHERE director_id=?;`;
 const deleteComposerQuery = `DELETE FROM composers WHERE composer_id=?;`;
 const deleteActorQuery = `DELETE FROM actors WHERE actor_id=?;`;
+const deleteGenreQuery = `DELETE FROM genres WHERE genre_id=?;`;
+const deletePerformanceQuery = `DELETE FROM performances WHERE actor_id=? AND movie_id=?`
 
 const getAllData = (current_query, res) => {
     mysql.pool.query(current_query, (err, rows, fields) => {
@@ -105,11 +117,16 @@ app.get('/', function (req, res, next) {
         currentQuery = getActorsQuery;
     }
 
+    // genres in request header
+    if (req.headers.table_name == 'genres') {
+        currentQuery = getGenresQuery;
+    }
+
     // performances in get req header
     if (req.headers.table_name == 'performances') {
         currentQuery = getPerformancesQuery;
     }
-    
+
     // genreInstances in get req header
     if (req.headers.table_name == 'genre_instances') {
         currentQuery = getGenreInstancesQuery;
@@ -123,18 +140,6 @@ app.get('/', function (req, res, next) {
         getAllData(currentQuery, res);
     });
 });
-
-// app.get('/actors', function (req, res, next) {
-//     // Select actors by ID here, easier to grab the most recent actor and update the table. Probably an easier way to do this.
-//     var current_query = getActorsByID;
-//     mysql.pool.query(current_query, (err, rows, fields) => {
-//         if (err) {
-//             next(err);
-//             return;
-//         }
-//         getAllData(current_query, res);
-//     });    
-// })
 
 // insert
 app.post('/', function (req, res, next) {
@@ -207,12 +212,43 @@ app.post('/', function (req, res, next) {
                 getAllData(getActorsQuery, res);
             });
     }
+
+    // insert genre
+    if (req.body.table_name == 'genres') {
+        mysql.pool.query(insertGenreQuery,
+            [
+                req.body.name
+            ],
+            (err, result) => {
+                if (err) {
+                    next(err);
+                    return;
+                }
+                // send all data
+                getAllData(getGenresQuery, res);
+            });
+    }
+
+    // insert performance
+    if (req.body.table_name == 'performances') {
+        mysql.pool.query(insertPerformanceQuery,
+            [
+                req.body.actor_id,
+                req.body.movie_id
+            ],
+            (err, result) => {
+                if (err) {
+                    next(err);
+                    return;
+                }
+                // send all data
+                getAllData(getPerformancesQuery, res);
+            });
+    }
 });
 
 // update
 app.put('/', function (req, res, next) {
-    var current_update_query;
-
     // update movie
     if (req.body.table_name == 'movies') {
         mysql.pool.query(
@@ -251,7 +287,6 @@ app.put('/', function (req, res, next) {
 
     // update composers
     if (req.body.table_name == 'composers') {
-        //  var current_query = getComposersQuery;
         mysql.pool.query(
             updateComposersQuery,
             [req.body.first_name, req.body.last_name, req.body.composer_id],
@@ -266,8 +301,7 @@ app.put('/', function (req, res, next) {
     }
 
     // update actor
-    if (req.body.table_name == 'actors') {
-        // var current_query = getActorsQuery;
+    if (req.body.table_name == 'actors') {;
         mysql.pool.query(
             updateActorsQuery,
             [req.body.first_name, req.body.last_name, req.body.actor_id],
@@ -278,6 +312,21 @@ app.put('/', function (req, res, next) {
                 }
                 // send all data
                 getAllData(getActorsQuery, res);
+            });
+    }
+
+    // update genre
+    if (req.body.table_name == 'genres') {
+        mysql.pool.query(
+            updateGenresQuery,
+            [req.body.name, req.body.genre_id],
+            (err, result) => {
+                if (err) {
+                    next(err);
+                    return;
+                }
+                // send all data
+                getAllData(getGenresQuery, res);
             });
     }
 });
@@ -327,6 +376,29 @@ app.delete('/', function (req, res, next) {
                 return;
             }
             getAllData(getActorsQuery, res)
+        });
+    }
+
+    // delete genre
+    if (req.body.table_name == "genres") {
+        mysql.pool.query(deleteGenreQuery, [req.body.genre_id], (err, rows, fields) => {
+            if (err) {
+                next(err);
+                return;
+            }
+            getAllData(getGenresQuery, res)
+        });
+    }
+
+    // delete performance
+    if (req.body.table_name == "performances") {
+        mysql.pool.query(deletePerformanceQuery, [req.body.actor_id, req.body.movie_id], 
+            (err, rows, fields) => {
+            if (err) {
+                next(err);
+                return;
+            }
+            getAllData(getPerformancesQuery, res)
         });
     }
 

@@ -27,6 +27,8 @@
       <table id="performancesTable">
           <thead>
               <tr>
+                <th style="visibility:hidden;">actor id</th>
+                <th style="visibility:hidden;">movie id</th>
                   <th>Movie</th>
                   <th>Actor</th>
                   <th></th>
@@ -35,6 +37,24 @@
           <tbody>
           </tbody>
       </table>
+
+    <!-- <h1>Add New Performance</h1> -->
+    <form method="POST" id="addPerformanceForm">
+        <fieldset>
+            <legend>Add New Performance</legend>
+            <label>
+                Actor:
+                <select name="actor" id="addActorSelect">
+                </select>
+            </label>
+            <label>
+                Movie:
+                <select name="composer" id="addMovieSelect">
+                </select>
+            </label>
+            <input type="submit" value="submit" />
+        </fieldset>
+    </form>
   </div>
   <script src="performancesScript.js"></script>
  </body>

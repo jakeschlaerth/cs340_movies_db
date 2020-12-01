@@ -1,4 +1,5 @@
 const baseURL = `http://localhost:19191`;  
+// const baseURL = `http://flip1.engr.oregonstate.edu:19191`
 // const baseURL = `http://flip1.engr.oregonstate.edu:19191` // (or wherever you run the server) when live  
 // `http://localhost:19191` when local
 
@@ -174,7 +175,7 @@ getComposers = (currentCom, selectInput) => {
                 // this is where the magic happens              
                 var response = JSON.parse(req.responseText);
                 var composerArray = response.rows;
-                composerSelect = document.querySelector("#composerSelect");
+                // composerSelect = document.querySelector("#composerSelect");
                 var i;
                 for (i = 0; i < composerArray.length; i++) {
                     dropdownOption = document.createElement("option");

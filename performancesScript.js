@@ -1,4 +1,5 @@
 const baseURL = `http://localhost:19191`;
+// const baseURL = `http://flip1.engr.oregonstate.edu:19191`
 //const baseURL =  `http://flip3.engr.oregonstate.edu:19191` // (or wherever you run the server) when live   
 // `http://localhost:19191` when local
 
@@ -33,30 +34,43 @@ const makeTable = (allRows) => {
 };
 
 const makeRow = (currentRow, table) => {
-    // reference for moviesTable body
+    // reference for table body
     var tbody = table.firstElementChild;
     // new row
     var row = document.createElement("tr");
 
-    // // id will be hidden
-    // // new cell
-    // var idCell = document.createElement("td");
-    // // new cell text
-    // var idCellText = document.createTextNode(currentRow.actor_id);
-    // // hide cell
-    // idCell.style.visibility = "hidden";
-    // // append text to cell
-    // idCell.appendChild(idCellText);
-    // // append cell to row
-    // row.appendChild(idCell);
+    
+    // actor_id will be hidden
+    // new cell
+    var actorIDCell = document.createElement("td");
+    // new cell text
+    var actorIDCellText = document.createTextNode(currentRow.actor_id);
+    // hide cell
+    actorIDCell.style.visibility = "hidden";
+    // append text to cell
+    actorIDCell.appendChild(actorIDCellText);
+    // append cell to row
+    row.appendChild(actorIDCell);
+
+    // movie_id will be hidden
+    // new cell
+    var movieIDCell = document.createElement("td");
+    // new cell text
+    var movieIDCellText = document.createTextNode(currentRow.movie_id);
+    // hide cell
+    movieIDCell.style.visibility = "hidden";
+    // append text to cell
+    movieIDCell.appendChild(movieIDCellText);
+    // append cell to row
+    row.appendChild(movieIDCell);
 
     // make cell for each datum
+    // makeCell(currentRow.actor_id, row);
+    // makeCell(currentRow.movie_id, row);
     makeCell(currentRow.actor, row);
     makeCell(currentRow.title, row);
+    
 
-   
-
-   
 
     // delete button
     deleteButton = document.createElement("button");
@@ -86,7 +100,7 @@ const makeCell = (data, row) => {
 
 const deleteTable = (allRows) => {
     // set
-    currentDataRow = table.firstElementChild.firstElementChild;
+    currentDataRow = table.firstElementChild.firstElementChild.nextElementSibling;
     while (true) {
         if (currentDataRow.nextElementSibling == null) {
             currentDataRow.remove();
@@ -96,196 +110,141 @@ const deleteTable = (allRows) => {
     }
 };
 
+// submit row POST request, add row
+const newRowSubmit = document.getElementById('addPerformanceForm');
+newRowSubmit.addEventListener('submit', (e) => {
+    e.preventDefault();
+    var req = new XMLHttpRequest();
+    var payload = {
+        movie_id: null,
+        actor_id: null,
+        table_name: "performances"
+    };
 
-// // submit row POST request, add row
-// const newRowSubmit = document.getElementById('addDirectorForm');
-// newRowSubmit.addEventListener('submit', (e) => {
-//     e.preventDefault();
-//     var req = new XMLHttpRequest();
-//     var payload = {
-//         first_name: null,
-//         last_name: null,
-//         table_name: "directors"
-//     };
-//     payload.first_name = document.getElementById("firstNameInput").value;
-//     payload.last_name = document.getElementById("lastNameInput").value;
+    payload.actor_id = document.getElementById("addActorSelect").value;
+    payload.movie_id = document.getElementById("addMovieSelect").value;
 
-//     req.open("POST", baseURL, true);
-//     req.setRequestHeader('Content-Type', 'application/json');
-//     req.onload = (e) => {
-//         if (req.readyState === 4) {
-//             if (req.status === 200) {
-//                 // this is where the magic happens
-//                 var response = JSON.parse(req.responseText);
-//                 allRows = response.rows;
-//                 // remove old table
-//                 deleteTable(allRows);
-//                 // rebuild from scratch
-//                 makeTable(allRows);
-//                 // return success or failure here
-//             } else {
-//                 console.error(req.statusText);
-//             }
-//         }
-//     };
-//     req.send(JSON.stringify(payload));
-// });
+    req.open("POST", baseURL, true);
+    req.setRequestHeader('Content-Type', 'application/json');
+    req.onload = (e) => {
+        if (req.readyState === 4) {
+            if (req.status === 200) {
+                // this is where the magic happens
+                var response = JSON.parse(req.responseText);
+                allRows = response.rows;
+                // remove old table
+                deleteTable(allRows);
+                // rebuild from scratch
+                makeTable(allRows);
+                // return success or failure here
+            } else {
+                console.error(req.statusText);
+            }
+        }
+    };
+    req.send(JSON.stringify(payload));
+});
 
-// table.addEventListener('click', (event) => {
-//     let target = event.target;
-//     if (target.id == "updateButton") {
-//         onUpdate(target);
-//     };
-//     if (target.id == "deleteButton") {
-//         onDelete(target)
-//     };
-//     // if it is an update button, send a PUT request to the server
-//     // if it is a delete button, send a delete request to the server
+// populates composer dropdown menu
+getActors = (currentAct, selectInput) => {
+    var req = new XMLHttpRequest();
+    req.open("GET", baseURL, true);
+    req.setRequestHeader("table_name", "actors", false);    // set what table we are requesting
+    req.onload = (e) => {
+        if (req.readyState === 4) {
+            if (req.status === 200) {
+                // this is where the magic happens              
+                var response = JSON.parse(req.responseText);
+                var actorArray = response.rows;
+                var i;
+                for (i = 0; i < actorArray.length; i++) {
+                    dropdownOption = document.createElement("option");
+                    dropdownOption.innerHTML = `${actorArray[i].first_name} ${actorArray[i].last_name}`;
+                    dropdownOption.value = actorArray[i].actor_id;
+                    // append
+                    selectInput.appendChild(dropdownOption);
+                }
+            } else {
+                console.log(baseURL)
+                console.error(req.statusText);
+            }
+        }
+    };
+    req.send();
+}
 
-//     // delete table
-//     // make table again
-// });
+// populates composer dropdown menu
+getMovies = (currentMov, selectInput) => {
+    var req = new XMLHttpRequest();
+    req.open("GET", baseURL, true);
+    req.setRequestHeader("table_name", "movies", false);    // set what table we are requesting
+    req.onload = (e) => {
+        if (req.readyState === 4) {
+            if (req.status === 200) {
+                // this is where the magic happens              
+                var response = JSON.parse(req.responseText);
+                var movieArray = response.rows;
+                var i;
+                for (i = 0; i < movieArray.length; i++) {
+                    dropdownOption = document.createElement("option");
+                    dropdownOption.innerHTML = `${movieArray[i].title}`;
+                    dropdownOption.value = movieArray[i].movie_id;
+                    // append
+                    selectInput.appendChild(dropdownOption);
+                }
+            } else {
+                console.log(baseURL)
+                console.error(req.statusText);
+            }
+        }
+    };
+    req.send();
+}
 
-// var updateBool = false;
-// const onUpdate = (target) => {
-//     if (updateBool == true) {
-//         alert("You are already updating a row!");
-//         return;
-//     }
-//     updateBool = true;
-//     //              button cell       row
-//     var updateRow = target.parentNode.parentNode
-//     //             button cell       row        id cell           id value
-//     var updateID = target.parentNode.parentNode.firstElementChild.innerHTML;
+addActorSelect = document.querySelector("#addActorSelect");
+addMovieSelect = document.querySelector("#addMovieSelect");
 
-//     // new header
-//     updateHeader = document.createElement("h1");
-//     // text content of header
-//     updateHeader.innerHTML = "Update Form";
-//     // append header to body
-//     document.body.appendChild(updateHeader);
+getActors(null, addActorSelect);
+getMovies(null, addMovieSelect);
 
-//     // starts pointing at first_name field
-//     var currentElement = updateRow.firstElementChild.nextElementSibling;
+table.addEventListener('click', (event) => {
+    let target = event.target;
+    if (target.id == "deleteButton") {
+        onDelete(target)
+    };
+    // if it is a delete button, send a delete request to the server
+});
 
-//     // new form
-//     updateForm = document.createElement("form");
-//     // append form to document
-//     document.body.appendChild(updateForm);
-
-//     // first_name label
-//     var first_name_label = document.createElement("label");
-//     first_name_label.innerText = "first name:"
-//     // first_name field
-//     var first_name_input = document.createElement("input");
-//     // first_name field input type
-//     first_name_input.setAttribute("type", "text");
-//     // first_name of field
-//     first_name_input.first_name = "first_name";
-//     // first_name field old value
-//     first_name_input.defaultValue = currentElement.innerText;
-//     // append
-//     first_name_label.appendChild(first_name_input);
-//     updateForm.appendChild(first_name_label);
-
-//     // iterate through siblings
-//     currentElement = currentElement.nextElementSibling;
-
-//     // last_name label
-//     var last_name_label = document.createElement("label");
-//     last_name_label.innerText = "last name:"
-//     // last_name field
-//     var last_name_input = document.createElement("input");
-//     // last_name field input type
-//     last_name_input.setAttribute("type", "text");
-//     // last_name of field
-//     last_name_input.last_name = "last_name";
-//     // last_name field old value
-//     last_name_input.defaultValue = currentElement.innerText;
-//     // append
-//     last_name_label.appendChild(last_name_input);
-//     updateForm.appendChild(last_name_label);
-
-//     // submit button
-//     var updateSubmit = document.createElement("input");
-//     updateSubmit.setAttribute("type", "submit");
-//     updateSubmit.value = "submit";
-//     // append
-//     updateForm.appendChild(updateSubmit);
-
-//     updateSubmit.addEventListener('click', (e) => {
-//         e.preventDefault();
-
-//         var req = new XMLHttpRequest();
-//         var updateURL = baseURL;
-//         var payload = {
-//             first_name: first_name_input.value,
-//             last_name: last_name_input.value,
-//             director_id: updateID,
-//             table_name: "directors"
-//         };
-//         req.open("PUT", baseURL, true);
-//         req.setRequestHeader('Content-Type', 'application/json');
-//         req.onload = (e) => {
-//             if (req.readyState === 4) {
-//                 if (req.status === 200) {
-//                     // this is where the magic happens
-//                     var response = JSON.parse(req.responseText);
-//                     allRows = response.rows;
-//                     // remove old table
-//                     deleteTable(allRows);
-//                     // rebuild from scratch
-//                     makeTable(allRows);
-//                     updateBool = false;
-
-//                 } else {
-//                     console.error(req.statusText);
-//                 }
-//             }
-//         }
-//         req.send(JSON.stringify(payload));
-//         updateHeader.remove();
-//         updateForm.remove();
-//     });
-// };
-
-// const onDelete = (target) => {
-//     //             button cell       row        id cell           id value
-//     var deleteID = target.parentNode.parentNode.firstElementChild.innerHTML;
-//     var req = new XMLHttpRequest();
-//     var payload = {
-//         director_id: deleteID,
-//         table_name: "directors"
-//     };
-
-//     var fkConflict = false;
-//     // can this director be deleted?
-//     req.open("GET", baseURL, true);
-//     req.setRequestHeader("table_name", "movies", false);    // set what table we are requesting
-//     req.onload = (e) => {
-//         if (req.readyState === 4) {
-//             if (req.status === 200) {
-//                 var response = JSON.parse(req.responseText);
-//                 var allRows = response.rows
-//                 // iterate through all movies, check for deleteID in director_id
-//                 var i;
-//                 for (i = 0; i < allRows.length; i++) {
-//                     if (allRows[i].director_id == deleteID) {
-//                         alert(`Sorry, ${allRows[i].director} cannot be deleted while listed as the director of ${allRows[i].title}`);
-//                         fkConflict = true;
-//                     }
-//                 }
-//                 if (!fkConflict) {
-//                     sendDeleteRequest(deleteID);
-//                 }
-//             } else {
-//                 console.log(baseURL)
-//                 console.error(req.statusText);
-//             }
-//         }
-//     };
-//     req.send();
-// };
+const onDelete = (target) => {
+    //                  button cell       row        actor id cell     id value
+    var deleteActorID = target.parentNode.parentNode.firstElementChild.innerHTML;
+    //                  button cell       row        actor id cell     movie id cell      id value
+    var deleteMovieID = target.parentNode.parentNode.firstElementChild.nextElementSibling.innerHTML;
+    var req = new XMLHttpRequest();
+    var payload = {
+        actor_id: deleteActorID,
+        movie_id: deleteMovieID,
+        table_name: "performances"
+    };
+    req.open("DELETE", baseURL, true);
+    req.setRequestHeader('Content-Type', 'application/json');
+    req.onload = (e) => {
+        if (req.readyState === 4) {
+            if (req.status === 200) {
+                // this is where the magic happens
+                var response = JSON.parse(req.responseText);
+                allRows = response.rows;
+                // remove old table
+                deleteTable(allRows);
+                // rebuild from scratch
+                makeTable(allRows);
+            } else {
+                console.error(req.statusText);
+            }
+        }
+    }
+    req.send(JSON.stringify(payload));
+};
 
 // sendDeleteRequest = (deleteID) => {
 //     var del_req = new XMLHttpRequest();
