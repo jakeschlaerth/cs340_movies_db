@@ -269,23 +269,32 @@ const onDelete = (target) => {
         actor_id: deleteID,
         table_name: "actors"
     };
-    req.open("DELETE", baseURL, true);
-    req.setRequestHeader('Content-Type', 'application/json');
+
+    var fkConflict = false;
+    // can this actor be deleted?
+    req.open("GET", baseURL, true);
+    req.setRequestHeader("table_name", "performances", false);    // set what table we are requesting
     req.onload = (e) => {
         if (req.readyState === 4) {
             if (req.status === 200) {
-                // this is where the magic happens
                 var response = JSON.parse(req.responseText);
-                allRows = response.rows;
-                console.log(allRows)
-                // remove old table
-                deleteTable(allRows);
-                // rebuild from scratch
-                makeTable(allRows);
+                var allRows = response.rows
+                // iterate through all movies, check for deleteID in actor_id
+                var i;
+                for (i = 0; i < allRows.length; i++) {
+                    if (allRows[i].actor_id == deleteID) {
+                        alert(`Sorry, ${allRows[i].actor} cannot be deleted while listed as the director of ${allRows[i].title}`);
+                        fkConflict = true;
+                    }
+                }
+                if (!fkConflict) {
+                    sendDeleteRequest(deleteID);
+                }
             } else {
+                console.log(baseURL)
                 console.error(req.statusText);
             }
         }
-    }
-    req.send(JSON.stringify(payload));
+    };
+    req.send();
 };
