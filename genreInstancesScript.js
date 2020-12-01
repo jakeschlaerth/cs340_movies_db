@@ -1,17 +1,27 @@
 // reference for movies table
+const baseURL = `http://localhost:19191`;  
+
 const table = document.getElementById('genresTable');
 
-// sample data
-var allRows = [
-    {
-        genreID: "thriller",    // will be genreID
-        movieID: "Pulp Fiction",    // will be movieID
-    },
-    {
-        genreID: "action",
-        movieID: "Pulp Fiction",
+var req = new XMLHttpRequest();
+
+req.open("GET", baseURL, true);
+req.setRequestHeader("table_name", "genre_instances", false);    // set what table we are requesting
+req.onload = (e) => {
+    if (req.readyState === 4) {
+        if (req.status === 200) {
+            var response = JSON.parse(req.responseText);
+            var allRows = response.rows
+            console.log('success');
+            makeTable(allRows);
+            console.log(allRows);
+        } else {
+            console.log(baseURL)
+            console.error(req.statusText);
+        }
     }
-]
+};
+req.send();
 
 // build the table according to the allRows, an array of objects
 const makeTable = (allRows) => {
@@ -41,10 +51,9 @@ const makeRow = (currentRow, table) => {
     // row.appendChild(idCell);
 
     // make cell for each datum
-    makeCell(currentRow.movieID, row);
-    makeCell(currentRow.genreID, row);
+    makeCell(currentRow.title, row);
+    makeCell(currentRow.name, row);
 
-    console.log("hello")
     // delete button is unnecessary on genreInstances
     // deleteButton = document.createElement("button");
     // deleteButton.innerHTML = "delete";
@@ -70,5 +79,3 @@ const makeCell = (data, row) => {
     // append cell to row
     row.appendChild(cell);
 };
-
-makeTable(allRows);

@@ -34,6 +34,11 @@ const getPerformancesQuery =    `SELECT
                                 FROM performances
                                 INNER JOIN actors ON performances.actor_id=actors.actor_id
                                 INNER JOIN movies ON performances.movie_id=movies.movie_id`
+                                
+const getGenreInstancesQuery = `SELECT title, name 
+                            FROM genre_instances
+                            INNER JOIN genres on genre_instances.genre_id = genres.genre_id
+                            INNER JOIN movies on genre_instances.movie_id = movies.movie_id`
 
 const insertMovieQuery = `INSERT INTO movies 
                             (title, release_year, director_id, composer_id) 
@@ -104,6 +109,11 @@ app.get('/', function (req, res, next) {
     // actors in get req header
     if (req.headers.table_name == 'performances') {
         currentQuery = getPerformancesQuery;
+    }
+    
+    // genreInstances in get req header
+    if (req.headers.table_name == 'genre_instances') {
+        currentQuery = getGenreInstancesQuery;
     }
 
     mysql.pool.query(currentQuery, (err, rows, fields) => {
