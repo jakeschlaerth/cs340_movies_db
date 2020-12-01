@@ -27,6 +27,14 @@ const getComposersQuery = 'SELECT composer_id, first_name, last_name FROM compos
 
 const getActorsQuery = 'SELECT actor_id, first_name, last_name FROM actors ORDER BY last_name;';
 
+const getPerformancesQuery =    `SELECT 
+                                CONCAT(actors.first_name, ' ', actors.last_name) AS actor,
+                                movies.title AS title
+
+                                FROM performances
+                                INNER JOIN actors ON performances.actor_id=actors.actor_id
+                                INNER JOIN movies ON performances.movie_id=movies.movie_id`
+
 const insertMovieQuery = `INSERT INTO movies 
                             (title, release_year, director_id, composer_id) 
                             VALUES (?, ?, ?, ?)`;
@@ -91,6 +99,11 @@ app.get('/', function (req, res, next) {
     // actors in get req header
     if (req.headers.table_name == 'actors') {
         currentQuery = getActorsQuery;
+    }
+
+    // actors in get req header
+    if (req.headers.table_name == 'performances') {
+        currentQuery = getPerformancesQuery;
     }
 
     mysql.pool.query(currentQuery, (err, rows, fields) => {
@@ -186,21 +199,6 @@ app.post('/', function (req, res, next) {
             });
     }
 });
-// // insert actor
-// app.post('/add_actor', function (req, res) {
-//     sql = mysql.pool.query(insertActorQuery, [req.body.first_name, req.body.last_name], (err, result) => {
-//         console.log("started");
-//         if (err) {
-//             res.write(JSON.stringify(error));
-//             res.end();
-//         }
-//         else {
-//             // redirect to the new /actors GET handler. Will grab new actors table after the insert and return to client.
-//             // Probably a way to send back to the standard '/' GET handler, but unsure how to include req.header currently
-//             res.redirect('/actors');
-//         }
-//     });
-// });
 
 // update
 app.put('/', function (req, res, next) {
@@ -290,7 +288,6 @@ app.delete('/', function (req, res, next) {
         });
     }
 
-    const directorQuery = `SELECT title FROM movies WHERE director_id=?`;
     // delete director
     if (req.body.table_name == "directors") {
         mysql.pool.query(deleteDirectorQuery, [req.body.director_id], (err, rows, fields) => {
