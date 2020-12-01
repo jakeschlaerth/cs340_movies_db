@@ -27,6 +27,11 @@ const getComposersQuery = 'SELECT composer_id, first_name, last_name FROM compos
 
 const getActorsQuery = 'SELECT actor_id, first_name, last_name FROM actors ORDER BY last_name;';
 
+const getGenreInstancesQuery = `SELECT title, name 
+                            FROM genre_instances
+                            INNER JOIN genres on genre_instances.genre_id = genres.genre_id
+                            INNER JOIN movies on genre_instances.movie_id = movies.movie_id`
+
 const insertMovieQuery = `INSERT INTO movies 
                             (title, release_year, director_id, composer_id) 
                             VALUES (?, ?, ?, ?)`;
@@ -91,6 +96,11 @@ app.get('/', function (req, res, next) {
     // actors in get req header
     if (req.headers.table_name == 'actors') {
         currentQuery = getActorsQuery;
+    }
+
+    // genreInstances in get req header
+    if (req.headers.table_name == 'genre_instances') {
+        currentQuery = getGenreInstancesQuery;
     }
 
     mysql.pool.query(currentQuery, (err, rows, fields) => {
