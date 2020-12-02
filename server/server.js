@@ -64,7 +64,10 @@ const insertActorQuery =        `INSERT INTO actors (first_name, last_name) VALU
 const insertGenreQuery =        `INSERT INTO genres (name) VALUES (?);`;
 const insertPerformanceQuery =  `INSERT INTO performances
                                 (actor_id, movie_id)
-                                VALUE (?, ?)`
+                                VALUE (?, ?);`;
+const insertGenreInstanceQuery =    `INSERT INTO genre_instances
+                                    (movie_id, genre_id)
+                                    VALUES (?, ?);`;
 
 const updateMoviesQuery =       `UPDATE movies 
                                 SET title=?, 
@@ -83,6 +86,7 @@ const deleteComposerQuery = `DELETE FROM composers WHERE composer_id=?;`;
 const deleteActorQuery = `DELETE FROM actors WHERE actor_id=?;`;
 const deleteGenreQuery = `DELETE FROM genres WHERE genre_id=?;`;
 const deletePerformanceQuery = `DELETE FROM performances WHERE actor_id=? AND movie_id=?`
+const deleteGenreInstanceQuery = `DELETE FROM genre_instances WHERE genre_id=? AND movie_id=?;`;
 
 const getAllData = (current_query, res) => {
     mysql.pool.query(current_query, (err, rows, fields) => {
@@ -245,6 +249,23 @@ app.post('/', function (req, res, next) {
                 getAllData(getPerformancesQuery, res);
             });
     }
+
+    // insert genre instance
+    if (req.body.table_name == 'genre_instances') {
+        mysql.pool.query(insertGenreInstanceQuery,
+            [
+                req.body.movie_id,
+                req.body.genre_id
+            ],
+            (err, result) => {
+                if (err) {
+                    next(err);
+                    return;
+                }
+                // send all data
+                getAllData(getGenreInstancesQuery, res);
+            });
+    }
 });
 
 // update
@@ -400,6 +421,18 @@ app.delete('/', function (req, res, next) {
             }
             getAllData(getPerformancesQuery, res)
         });
+    }
+
+    // delete performance
+    if (req.body.table_name == "genre_instances") {
+        mysql.pool.query(deleteGenreInstanceQuery, [req.body.genre_id, req.body.movie_id],
+            (err, rows, fields) => {
+                if (err) {
+                    next(err);
+                    return;
+                }
+                getAllData(getGenreInstancesQuery, res)
+            });
     }
 
 });

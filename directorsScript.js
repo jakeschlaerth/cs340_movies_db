@@ -34,7 +34,7 @@ const makeTable = (allRows) => {
 };
 
 const makeRow = (currentRow, table) => {
-    // reference for moviesTable body
+    // reference for directorsTable body
     var tbody = table.firstElementChild;
     // new row
     var row = document.createElement("tr");

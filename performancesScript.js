@@ -212,7 +212,6 @@ table.addEventListener('click', (event) => {
     if (target.id == "deleteButton") {
         onDelete(target)
     };
-    // if it is a delete button, send a delete request to the server
 });
 
 const onDelete = (target) => {

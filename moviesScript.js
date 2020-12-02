@@ -5,7 +5,6 @@ const baseURL = `http://localhost:19191`;
 
 // basic get request, builds table
 var req = new XMLHttpRequest();
-
 req.open("GET", baseURL, true);
 req.setRequestHeader("table_name", "movies", false);    // set what table we are requesting
 req.onload = (e) => {
@@ -14,7 +13,6 @@ req.onload = (e) => {
             var response = JSON.parse(req.responseText);
             var allRows = response.rows
             makeTable(allRows);
-            console.log(allRows);
         } else {
             console.log(baseURL)
             console.error(req.statusText);
@@ -243,17 +241,19 @@ newRowSubmit.addEventListener('submit', (e) => {
 
 table.addEventListener('click', (event) => {
     let target = event.target;
+    // if it is an update button, send a PUT request to the server
     if (target.id == "updateButton") {
         onUpdate(target);
     };
-    if (target.id == "deleteButton") {
-        onDelete(target)
-    };
-    // if it is an update button, send a PUT request to the server
     // if it is a delete button, send a delete request to the server
+    if (target.id == "deleteButton") {
+        onDelete(target);
+    };
 
-    // delete table
-    // make table again
+    if (target.id == "viewGenresButton") {
+        onViewGenres(target);
+    };
+
 });
 
 var updateBool = false;
@@ -435,3 +435,34 @@ const onDelete = (target) => {
     }
     req.send(JSON.stringify(payload));
 };
+
+onViewGenres = (target) => {
+    //             button cell       row        id cell           id value
+    var movieID = target.parentNode.parentNode.firstElementChild.innerHTML;
+    var req = new XMLHttpRequest();
+    req.open("GET", baseURL, true);
+    // set what table we are requesting
+    req.setRequestHeader("table_name", "genre_instances", false);
+    req.onload = (e) => {
+        if (req.readyState === 4) {
+            if (req.status === 200) {
+                var response = JSON.parse(req.responseText);
+                var genreInstances = response.rows;
+                // console.log(genreInstances);
+                var i;
+                for (i=0; i<genreInstances.length; i++) {
+                    if (genreInstances[i].movie_id == movieID)
+                    {
+                        // print this to the empty table
+                        console.log(genreInstances[i].name)
+                    }
+                }
+                
+            } else {
+                console.log(baseURL)
+                console.error(req.statusText);
+            }
+        }
+    };
+    req.send();
+}

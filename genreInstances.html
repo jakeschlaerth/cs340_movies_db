@@ -28,11 +28,28 @@
     </nav>
     <table id="genresTable">
         <tr>
-            <!-- <th style="visibility:hidden;">id</th> -->
+            <th style="visibility:hidden;">genre id</th>
+            <th style="visibility:hidden;">movie id</th>
             <th>Movie Title</th>
             <th>Genre Name</th>
         </tr>
     </table>
+    <form method="POST" id="addGenreInstanceForm">
+        <fieldset>
+            <legend>Add New Genre Instance</legend>
+            <label>
+                Genre:
+                <select name="genre" id="addGenresSelect">
+                </select>
+            </label>
+            <label>
+                Movie:
+                <select name="movie" id="addMoviesSelect">
+                </select>
+            </label>
+            <input type="submit" value="submit" />
+        </fieldset>
+    </form>
 </body>
 <script src="genreInstancesScript.js"></script>
 
