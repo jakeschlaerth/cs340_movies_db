@@ -1,4 +1,4 @@
-const baseURL = `http://localhost:19191`;  
+const baseURL = `http://localhost:19191`;
 // const baseURL = `http://flip1.engr.oregonstate.edu:19191`
 // const baseURL = `http://flip1.engr.oregonstate.edu:19191` // (or wherever you run the server) when live  
 // `http://localhost:19191` when local
@@ -30,7 +30,7 @@ const makeTable = (allRows) => {
         var currentRow = allRows[row];
         makeRow(currentRow, table);
     };
-}; 
+};
 
 const makeRow = (currentRow, table) => {
     // reference for moviesTable body
@@ -53,11 +53,11 @@ const makeRow = (currentRow, table) => {
     // make cell for each datum
     makeCell(currentRow.title, row);
     makeCell(currentRow.release_year, row);
-    let director_id = currentRow.director_id;
+    //let director_id = currentRow.director_id;
 
-    makeCell(currentRow.director, row); // TODO look up a director ID, currently hardcoded
-    makeCell(currentRow.composer, row); // TODO look up a composer ID
-    // makeCell(currentRow.genres, row);   // parse all genre instances with this movieID
+    makeCell(currentRow.director, row);
+    makeCell(currentRow.composer, row);
+    // makeCell(currentRow.genres, row);   
 
     // view genres button
     viewGenresButton = document.createElement("button");
@@ -119,7 +119,7 @@ const makeCell = (data, row) => {
 };
 
 const deleteTable = (allRows) => {
-    currentDataRow = table.firstElementChild.firstElementChild. nextElementSibling;
+    currentDataRow = table.firstElementChild.firstElementChild.nextElementSibling;
     while (true) {
         if (currentDataRow.nextElementSibling == null) {
             currentDataRow.remove();
@@ -195,6 +195,44 @@ getComposers = (currentCom, selectInput) => {
     req.send();
 }
 
+// populates genres
+getGenres = (movieID, resultsTable) => {
+    var req = new XMLHttpRequest();
+    req.open("GET", baseURL, true);
+    req.setRequestHeader("table_name", "genre_instances", false);    // set what table we are requesting
+    req.onload = (e) => {
+        if (req.readyState === 4) {
+            if (req.status === 200) {
+                // this is where the magic happens              
+                var response = JSON.parse(req.responseText);
+                var genreInstancesArray = response.rows;
+                // composerSelect = document.querySelector("#composerSelect");
+                var i;
+                var genreArray = [];
+                for (i = 0; i < genreInstancesArray.length; i++) {
+
+                    if (genreInstancesArray[i].movie_id === movieID) {
+                        genreArray.push(genreInstancesArray[i].name)
+
+                    }
+                }
+                genreRow = document.createElement("tr");
+                makeCell("Genres:", genreRow);
+                for (i = 0; i < genreArray.length; i++) {
+
+                    makeCell(genreArray[i], genreRow)
+                }
+                resultsTable.appendChild(genreRow);
+
+            } else {
+                console.log(baseURL)
+                console.error(req.statusText);
+            }
+        }
+    };
+    req.send();
+}
+
 addDirectorSelect = document.querySelector("#addDirectorSelect");
 addComposerSelect = document.querySelector("#addComposerSelect");
 // populate dropdowns in add movie form
@@ -258,8 +296,7 @@ table.addEventListener('click', (event) => {
 
 var updateBool = false;
 const onUpdate = (target) => {
-    if (updateBool == true)
-    {
+    if (updateBool == true) {
         alert("You are already updating a row!");
         return;
     }
@@ -281,7 +318,7 @@ const onUpdate = (target) => {
     document.body.appendChild(updateHeader);
     // starts pointing at title field
     var currentElement = updateRow.firstElementChild.nextElementSibling;
-    
+
     // new fieldset
     updateFieldset = document.createElement("fieldset");
     // new form
@@ -373,7 +410,6 @@ const onUpdate = (target) => {
     updateSubmit.addEventListener('click', (e) => {
         e.preventDefault();
         var req = new XMLHttpRequest();
-        var updateURL = baseURL;
         var payload = {
             title: titleInput.value,
             release_year: yearInput.value,
@@ -450,14 +486,13 @@ onViewGenres = (target) => {
                 var genreInstances = response.rows;
                 // console.log(genreInstances);
                 var i;
-                for (i=0; i<genreInstances.length; i++) {
-                    if (genreInstances[i].movie_id == movieID)
-                    {
+                for (i = 0; i < genreInstances.length; i++) {
+                    if (genreInstances[i].movie_id == movieID) {
                         // print this to the empty table
                         console.log(genreInstances[i].name)
                     }
                 }
-                
+
             } else {
                 console.log(baseURL)
                 console.error(req.statusText);
@@ -466,3 +501,61 @@ onViewGenres = (target) => {
     };
     req.send();
 }
+
+const searchDiv = document.querySelector("#searchDiv");
+const searchButton = document.querySelector("#searchButton");
+var searchResultTable = undefined;
+searchButton.addEventListener('click', (e) => {
+
+    e.preventDefault();
+    if (searchResultTable != undefined) {
+        searchResultTable.remove();
+    }
+    searchResultTable = document.createElement("table");
+    searchHeaderRow = document.createElement("tr");
+    searchResultRow = document.createElement("tr");
+    const searchInput = document.querySelector("#searchInput")
+    var req = new XMLHttpRequest();
+    req.open("GET", baseURL, true);
+    req.setRequestHeader("table_name", "movies", false);    // set what table we are requesting
+    req.onload = (e) => {
+        if (req.readyState === 4) {
+            if (req.status === 200) {
+
+                var response = JSON.parse(req.responseText);
+                var movies = response.rows
+                var i = 0;
+                for (i = 0; i < movies.length; i++) {
+                    // if (searchResultTable != undefined) {
+                    //     searchResultTable.remove();
+                    // }
+                    if (movies[i].title.toLowerCase() == searchInput.value.toLowerCase()) {
+                        // headers
+                        makeCell("Movie Title", searchHeaderRow);
+                        makeCell("Release Year", searchHeaderRow);
+                        makeCell("Director", searchHeaderRow);
+                        makeCell("Composer", searchHeaderRow);
+
+                        
+                        makeCell(movies[i].title, searchResultRow);
+                        makeCell(movies[i].release_year, searchResultRow);
+                        makeCell(movies[i].director, searchResultRow);
+                        makeCell(movies[i].composer, searchResultRow);
+
+                        // const searchResultsGenresRow = document.createElement("tr");
+                        getGenres(movies[i].movie_id, searchResultTable)
+                        // makeCell(movies[i].composer, searchResultRow);
+                        searchResultTable.appendChild(searchHeaderRow);
+                        searchResultTable.appendChild(searchResultRow);
+                        searchDiv.firstElementChild.firstElementChild.appendChild(searchResultTable)
+                        // console.log(movies[i]);
+                    }
+                }
+            } else {
+                console.log(baseURL)
+                console.error(req.statusText);
+            }
+        }
+    };
+    req.send();
+});

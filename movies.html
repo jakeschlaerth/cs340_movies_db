@@ -21,60 +21,66 @@
                 <li><a href="composers.html">View composers</a></li>
                 <li><a href="performances.html">View actor performances</a></li>
                 <li><a href="genres.html">View existing genres</a></li>
-                <li><a href="genreInstances.html">View all Genre-Movie pairings</a>
+                <li><a href="genreInstances.html">View all Genre-Movie
+                        pairings</a>
                 </li>
             </ul>
         </nav>
-    <div id="mainTableContainer">
-        <table id="moviesTable">
-            <tr>
-                <th style="visibility:hidden;">id</th>
-                <th>title</th>
-                <th>year</th>
-                <th>director</th>
-                <th>composer</th>
-                <th></th>
-                <th></th>
-                <th></th>
-                <th></th>
-            </tr>
-        </table>
-    </div>
+        
+        <div id="mainTableContainer">
+                <table id="moviesTable">
+                    <tr>
+                        <th style="visibility:hidden;">id</th>
+                        <th>title</th>
+                        <th>year</th>
+                        <th>director</th>
+                        <th>composer</th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                    </tr>
+                </table>
+        </div>
 
-    <h1>Add New Movie</h1>
-    <form method="POST" id="addMovieForm">
-        <fieldset>
-            <label>
-                Movie Title:
-                <input type="text" name="title" id="titleInput" />
-            </label>
-            <label>
-                Year Released:
-                <input type="number" name="releaseYear" id="releaseYearInput"
-                    value="2000" min="1950" max="2022" />
-            </label>
-            <label>
-                Director:
-                <select name="director" id="addDirectorSelect">
-                </select>
-            </label>
-            <label>
-                Composer:
-                <select name="composer" id="addComposerSelect">
+        <!-- <h1>Add New Movie</h1> -->
+        <form method="POST" id="addMovieForm">
+            <fieldset>
+                <legend>Add New Movie</legend>
+                <label>
+                    Movie Title:
+                    <input type="text" name="title" id="titleInput" />
+                </label>
+                <label>
+                    Year Released:
+                    <input type="number" name="releaseYear"
+                        id="releaseYearInput" value="2000" min="1950"
+                        max="2022" />
+                </label>
+                <label>
+                    Director:
+                    <select name="director" id="addDirectorSelect">
                     </select>
-            </label>
-            <input type="submit" value="submit"/>
-        </fieldset>
-    </form>
+                </label>
+                <label>
+                    Composer:
+                    <select name="composer" id="addComposerSelect">
+                    </select>
+                </label>
+                <input type="submit" value="submit" />
+            </fieldset>
+        </form>
 
-    <form id="movieSearch">
-        <fieldset>
-            <legend>Search for a movie</legend>
-            <input type="text" id="movieSearchInput" placeholder="Movie Name">
-            <button type="submit" form="movieSearch"
-                value="Submit">Search</button>
-        </fieldset>
-    </form>
+        <div id="searchDiv">
+            <form id="movieSearch">
+                <fieldset>
+                    <legend>Search for a movie</legend>
+                    <input type="text" id="searchInput" placeholder="Movie Name">
+                    <button type="submit" form="movieSearch"
+                        value="submit" id="searchButton">Search</button>
+                </fieldset>
+            </form>
+        </div>
 </body>
 <script src="moviesScript.js"></script>
 <!-- <script src="script.js"></script> -->

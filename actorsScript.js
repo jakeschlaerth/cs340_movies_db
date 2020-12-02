@@ -284,7 +284,7 @@ const onDelete = (target) => {
                 var i;
                 for (i = 0; i < allRows.length; i++) {
                     if (allRows[i].actor_id == deleteID) {
-                        alert(`Sorry, ${allRows[i].actor} cannot be deleted while listed as the director of ${allRows[i].title}`);
+                        alert(`Sorry, ${allRows[i].actor} cannot be deleted while listed as an actor in ${allRows[i].title}`);
                         fkConflict = true;
                     }
                 }
@@ -299,3 +299,29 @@ const onDelete = (target) => {
     };
     req.send();
 };
+
+sendDeleteRequest = (deleteID) => {
+    var del_req = new XMLHttpRequest();
+    var payload = {
+        actor_id: deleteID,
+        table_name: "actors"
+    };
+    del_req.open("DELETE", baseURL, true);
+    del_req.setRequestHeader('Content-Type', 'application/json');
+    del_req.onload = (e) => {
+        if (del_req.readyState === 4) {
+            if (del_req.status === 200) {
+                // this is where the magic happens
+                var response = JSON.parse(del_req.responseText);
+                allRows = response.rows;
+                // remove old table
+                deleteTable(allRows);
+                // rebuild from scratch
+                makeTable(allRows);
+            } else {
+                console.error(req.statusText);
+            }
+        }
+    }
+    del_req.send(JSON.stringify(payload));
+}

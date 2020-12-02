@@ -19,7 +19,7 @@ const getMoviesQuery =  `SELECT
                         FROM movies
                         INNER JOIN directors ON movies.director_id = directors.director_id
                         INNER JOIN composers ON movies.composer_id = composers.composer_id
-                        ORDER BY release_year DESC;`;
+                        ORDER BY title;`;
 
 const getDirectorsQuery =   `SELECT director_id, 
                             first_name, 
