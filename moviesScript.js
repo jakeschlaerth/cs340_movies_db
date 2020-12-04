@@ -126,7 +126,7 @@ const makeGenreInstanceRow = (currentRow, table) => {
     // new cell text
     var genreIDCellText = document.createTextNode(currentRow.genre_id);
     // hide cell
-    genreIDCell.style.visibility = "hidden";
+    genreIDCell.style.display = "none";
     // append text to cell
     genreIDCell.appendChild(genreIDCellText);
     // append cell to row
@@ -138,7 +138,7 @@ const makeGenreInstanceRow = (currentRow, table) => {
     // new cell text
     var movieIDCellText = document.createTextNode(currentRow.movie_id);
     // hide cell
-    movieIDCell.style.visibility = "hidden";
+    movieIDCell.style.display = "none";
     // append text to cell
     movieIDCell.appendChild(movieIDCellText);
     // append cell to row
