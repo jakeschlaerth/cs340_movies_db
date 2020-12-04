@@ -1,5 +1,5 @@
-const baseURL = `http://localhost:19191`;
-// const baseURL = `http://flip1.engr.oregonstate.edu:19191`
+// const baseURL = `http://localhost:19191`;
+const baseURL = `http://flip1.engr.oregonstate.edu:19191`
 //const baseURL =  `http://flip3.engr.oregonstate.edu:19191` // (or wherever you run the server) when live   
 // `http://localhost:19191` when local
 
@@ -237,6 +237,9 @@ const onUpdate = (target) => {
     updateSubmit.value = "submit";
     // append
     fieldset.appendChild(updateSubmit);
+    
+    // scroll to edit form
+    window.scrollTo(0, document.body.scrollHeight);
 
     updateSubmit.addEventListener('click', (e) => {
         e.preventDefault();

@@ -1,7 +1,7 @@
 // reference for movies table
-const baseURL = 'http://localhost:19191'
+// const baseURL = 'http://localhost:19191'
 //var baseURL = require('./baseURL');
-// const baseURL = `http://flip1.engr.oregonstate.edu:19191`
+const baseURL = `http://flip1.engr.oregonstate.edu:19191`
 const table = document.getElementById('genresTable');
 
 // basic get request, builds table

@@ -1,5 +1,5 @@
-const baseURL = `http://localhost:19191`;
-// const baseURL = `http://flip1.engr.oregonstate.edu:19191`
+// const baseURL = `http://localhost:19191`;
+const baseURL = `http://flip1.engr.oregonstate.edu:19191`
 // const baseURL = `http://flip1.engr.oregonstate.edu:19191` // (or wherever you run the server) when live  
 // `http://localhost:19191` when local
 
@@ -254,9 +254,9 @@ getGenres = (movieID, resultsTable) => {
                 var genreArray = [];
                 for (i = 0; i < genreInstancesArray.length; i++) {
 
-                    if (genreInstancesArray[i].movie_id === movieID) {
+                    if (genreInstancesArray[i].movie_id == movieID) {
+                        console.log("pushing")
                         genreArray.push(genreInstancesArray[i].name)
-
                     }
                 }
                 genreRow = document.createElement("tr");
@@ -398,14 +398,16 @@ const onUpdate = (target) => {
     // starts pointing at title field
     var currentElement = updateRow.firstElementChild.nextElementSibling;
 
-    // new fieldset
-    updateFieldset = document.createElement("fieldset");
+
     // new form
     updateForm = document.createElement("form");
     // append form to fieldset
-    updateFieldset.appendChild(updateForm);
-    // append fieldset to doc body
-    document.body.appendChild(updateFieldset);
+    fieldset = document.createElement("fieldset");
+    legend = document.createElement("legend");
+    legend.innerHTML = "Edit Form";
+    fieldset.appendChild(legend);
+    updateForm.appendChild(fieldset);
+    document.body.appendChild(updateForm);
 
     // title label
     var titleLabel = document.createElement("label");
@@ -420,7 +422,7 @@ const onUpdate = (target) => {
     titleInput.defaultValue = currentElement.innerText;
     // append
     titleLabel.appendChild(titleInput);
-    updateForm.appendChild(titleLabel);
+    fieldset.appendChild(titleLabel);
 
     // iterate through siblings
     currentElement = currentElement.nextElementSibling;
@@ -438,7 +440,7 @@ const onUpdate = (target) => {
     yearInput.defaultValue = currentElement.innerText;
     // append
     yearLabel.appendChild(yearInput);
-    updateForm.appendChild(yearLabel);
+    fieldset.appendChild(yearLabel);
 
     // iterate through siblings
     currentElement = currentElement.nextElementSibling;
@@ -457,7 +459,7 @@ const onUpdate = (target) => {
     directorSelect.name = "director";
     // append
     directorLabel.appendChild(directorSelect);
-    updateForm.appendChild(directorLabel);
+    fieldset.appendChild(directorLabel);
 
     // iterate through siblings
     currentElement = currentElement.nextElementSibling;
@@ -477,14 +479,16 @@ const onUpdate = (target) => {
     // composerInput.defaultValue = currentElement.innerText;
     // append
     composerLabel.appendChild(composerSelect);
-    updateForm.appendChild(composerLabel);
+    fieldset.appendChild(composerLabel);
 
     // submit button
     var updateSubmit = document.createElement("input");
     updateSubmit.setAttribute("type", "submit");
     updateSubmit.value = "submit";
     // append
-    updateForm.appendChild(updateSubmit);
+    fieldset.appendChild(updateSubmit);
+    document.body.appendChild(updateForm);
+    window.scrollTo(0, document.body.scrollHeight);
 
     updateSubmit.addEventListener('click', (e) => {
         e.preventDefault();
@@ -510,7 +514,7 @@ const onUpdate = (target) => {
                     // rebuild from scratch
                     makeTable(allRows);
                     updateBool = false;
-
+                    alert(`Successfully updated ${payload.title}`)
                 } else {
                     console.error(req.statusText);
                 }
@@ -518,7 +522,7 @@ const onUpdate = (target) => {
         }
         req.send(JSON.stringify(payload));
         updateHeader.remove();
-        updateFieldset.remove();
+        updateForm.remove();
     });
 };
 
@@ -626,13 +630,12 @@ searchButton.addEventListener('click', (e) => {
             if (req.status === 200) {
 
                 var response = JSON.parse(req.responseText);
-                var movies = response.rows
+                var movies = response.rows;
+                var exists = false;
                 var i = 0;
                 for (i = 0; i < movies.length; i++) {
-                    // if (searchResultTable != undefined) {
-                    //     searchResultTable.remove();
-                    // }
                     if (movies[i].title.toLowerCase() == searchInput.value.toLowerCase()) {
+                        exists = true;
                         // headers
                         makeCell("Movie Title", searchHeaderRow);
                         makeCell("Release Year", searchHeaderRow);
@@ -650,8 +653,11 @@ searchButton.addEventListener('click', (e) => {
 
                         searchResultTable.appendChild(searchHeaderRow);
                         searchResultTable.appendChild(searchResultRow);
-                        searchDiv.firstElementChild.firstElementChild.appendChild(searchResultTable)
+                        searchDiv.firstElementChild.firstElementChild.appendChild(searchResultTable);
                     }
+                }
+                if (!exists) {
+                    alert(`Sorry, ${searchInput.value} doesn't exit in our databse.`);
                 }
             } else {
                 console.log(baseURL)
