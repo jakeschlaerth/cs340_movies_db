@@ -1,14 +1,16 @@
 <!DOCTYPE html>
 <html>
- <head>
-  <meta charset="UTF-8">
-  <title>Performances</title>
-  <link rel="stylesheet" href="styles.css">
-<link
-    href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400&display=swap"
-    rel="stylesheet">
- </head>
- <body>
+
+<head>
+    <meta charset="UTF-8">
+    <title>Performances</title>
+    <link rel="stylesheet" href="styles.css">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400&display=swap"
+        rel="stylesheet">
+</head>
+
+<body>
     <nav class="navbar-container">
         <ul class="navbar-list">
             <li><a href="movies.html">View movies</a></li>
@@ -21,41 +23,42 @@
             </li>
         </ul>
     </nav>
-  <h1>Performances</h1>
-  <div class='table-and-forms'>
-    
-      <table id="performancesTable">
-          <thead>
-              <tr>
-                <th style="visibility:hidden;">actor id</th>
-                <th style="visibility:hidden;">movie id</th>
-                  <th>Movie</th>
-                  <th>Actor</th>
-                  <th></th>
-              </tr>
-          </thead>
-          <tbody>
-          </tbody>
-      </table>
+    <h1>Performances</h1>
+    <div class='table-and-forms'>
 
-    <!-- <h1>Add New Performance</h1> -->
-    <form method="POST" id="addPerformanceForm">
-        <fieldset>
-            <legend>Add New Performance</legend>
-            <label>
-                Actor:
-                <select name="actor" id="addActorSelect">
-                </select>
-            </label>
-            <label>
-                Movie:
-                <select name="composer" id="addMovieSelect">
-                </select>
-            </label>
-            <input type="submit" value="submit" />
-        </fieldset>
-    </form>
-  </div>
-  <script src="performancesScript.js"></script>
- </body>
+        <form method="POST" id="addPerformanceForm">
+            <fieldset>
+                <legend>Add New Performance</legend>
+                <label>
+                    Actor:
+                    <select name="actor" id="addActorSelect">
+                    </select>
+                </label>
+                <label>
+                    Movie:
+                    <select name="composer" id="addMovieSelect">
+                    </select>
+                </label>
+                <input type="submit" value="submit" />
+            </fieldset>
+        </form>
+
+        <table id="performancesTable">
+            <thead>
+                <tr>
+                    <th style="display:none;">actor id</th>
+                    <th style="display:none;">movie id</th>
+                    <th>Movie</th>
+                    <th>Actor</th>
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+
+
+    </div>
+    <script src="performancesScript.js"></script>
+</body>
+
 </html>

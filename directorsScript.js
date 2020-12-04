@@ -45,7 +45,7 @@ const makeRow = (currentRow, table) => {
     // new cell text
     var idCellText = document.createTextNode(currentRow.director_id);
     // hide cell
-    idCell.style.visibility = "hidden";
+    idCell.style.display = "none";
     // append text to cell
     idCell.appendChild(idCellText);
     // append cell to row
@@ -56,15 +56,15 @@ const makeRow = (currentRow, table) => {
     makeCell(currentRow.last_name, row);
 
     // view movies button
-    viewGenresButton = document.createElement("button");
-    viewGenresButton.innerHTML = "View movies";
-    viewGenresButton.id = "viewGenresButton";
+    viewMoviesButton = document.createElement("button");
+    viewMoviesButton.innerHTML = "View movies";
+    viewMoviesButton.id = "viewMoviesButton";
     // new cell
-    var viewGenresCell = document.createElement("td");
+    var viewMoviesCell = document.createElement("td");
     // append button to cell
-    viewGenresCell.appendChild(viewGenresButton);
+    viewMoviesCell.appendChild(viewMoviesButton);
     // append cell to row
-    row.append(viewGenresCell);
+    row.append(viewMoviesCell);
 
     // update button
     updateButton = document.createElement("button");
@@ -142,6 +142,7 @@ newRowSubmit.addEventListener('submit', (e) => {
                 // rebuild from scratch
                 makeTable(allRows);
                 // return success or failure here
+                alert(`Added director ${payload.first_name} ${payload.last_name}`)
             } else {
                 console.error(req.statusText);
             }
@@ -155,14 +156,14 @@ table.addEventListener('click', (event) => {
     if (target.id == "updateButton") {
         onUpdate(target);
     };
+
     if (target.id == "deleteButton") {
         onDelete(target)
     };
-    // if it is an update button, send a PUT request to the server
-    // if it is a delete button, send a delete request to the server
 
-    // delete table
-    // make table again
+    if (target.id == "viewMoviesButton") {
+        onViewMovies(target);
+    };
 });
 
 var updateBool = false;
@@ -180,7 +181,7 @@ const onUpdate = (target) => {
     // new header
     updateHeader = document.createElement("h1");
     // text content of header
-    updateHeader.innerHTML = "Update Form";
+    updateHeader.innerHTML = "Edit Form";
     // append header to body
     document.body.appendChild(updateHeader);
 
@@ -190,6 +191,11 @@ const onUpdate = (target) => {
     // new form
     updateForm = document.createElement("form");
     // append form to document
+    fieldset = document.createElement("fieldset");
+    legend = document.createElement("legend");
+    legend.innerHTML = "Edit Form";
+    fieldset.appendChild(legend);
+    updateForm.appendChild(fieldset);
     document.body.appendChild(updateForm);
 
     // first_name label
@@ -205,7 +211,7 @@ const onUpdate = (target) => {
     first_name_input.defaultValue = currentElement.innerText;
     // append
     first_name_label.appendChild(first_name_input);
-    updateForm.appendChild(first_name_label);
+    fieldset.appendChild(first_name_label);
 
     // iterate through siblings
     currentElement = currentElement.nextElementSibling;
@@ -223,20 +229,18 @@ const onUpdate = (target) => {
     last_name_input.defaultValue = currentElement.innerText;
     // append
     last_name_label.appendChild(last_name_input);
-    updateForm.appendChild(last_name_label);
+    fieldset.appendChild(last_name_label);
 
     // submit button
     var updateSubmit = document.createElement("input");
     updateSubmit.setAttribute("type", "submit");
     updateSubmit.value = "submit";
     // append
-    updateForm.appendChild(updateSubmit);
+    fieldset.appendChild(updateSubmit);
 
     updateSubmit.addEventListener('click', (e) => {
         e.preventDefault();
-
         var req = new XMLHttpRequest();
-        var updateURL = baseURL;
         var payload = {
             first_name: first_name_input.value,
             last_name: last_name_input.value,
@@ -256,7 +260,8 @@ const onUpdate = (target) => {
                     // rebuild from scratch
                     makeTable(allRows);
                     updateBool = false;
-
+                    // return success
+                    alert(`updated director to ${payload.first_name} ${payload.last_name}`);
                 } else {
                     console.error(req.statusText);
                 }
@@ -292,6 +297,7 @@ const onDelete = (target) => {
                     if (allRows[i].director_id == deleteID) {
                         alert(`Sorry, ${allRows[i].director} cannot be deleted while listed as the director of ${allRows[i].title}`);
                         fkConflict = true;
+                        return;
                     }
                 }
                 if (!fkConflict) {
@@ -331,3 +337,141 @@ sendDeleteRequest = (deleteID) => {
     }
    del_req.send(JSON.stringify(payload));
 }
+
+onViewMovies = (target) => {
+    //             button cell       row        id cell           id value
+    var searchID = target.parentNode.parentNode.firstElementChild.innerHTML;
+    if (searchResultTable != undefined) {
+        searchResultTable.remove();
+    }
+    searchResultTable = document.createElement("table");
+    searchHeaderRow = document.createElement("tr");
+    // headers
+    makeCell("Movie Title", searchHeaderRow);
+    makeCell("Release Year", searchHeaderRow);
+    makeCell("Director", searchHeaderRow);
+    makeCell("Composer", searchHeaderRow);
+    var req = new XMLHttpRequest();
+    req.open("GET", baseURL, true);
+    req.setRequestHeader("table_name", "movies", false);    // set what table we are requesting
+    req.onload = (e) => {
+        if (req.readyState === 4) {
+            if (req.status === 200) {
+
+                var response = JSON.parse(req.responseText);
+                var movies = response.rows
+                var i = 0;
+                var results = [];
+                for (i = 0; i < movies.length; i++) {
+                    if (movies[i].director_id == searchID) {
+                        // make a row for this movie
+                        results.push(movies[i]);
+                    }
+                }
+                if (results.length == 0) {
+                    alert("Sorry, no movies with that director.")
+                }
+                searchResultTable.appendChild(searchHeaderRow);
+                for (i = 0; i < results.length; i++) {
+                    // movie data
+                    searchResultRow = document.createElement("tr");
+                    makeCell(results[i].title, searchResultRow);
+                    makeCell(results[i].release_year, searchResultRow);
+                    makeCell(results[i].director, searchResultRow);
+                    makeCell(results[i].composer, searchResultRow);
+
+                    // append
+                    searchResultTable.appendChild(searchResultRow);
+                    searchDiv.firstElementChild.firstElementChild.appendChild(searchResultTable)
+
+                }
+            } else {
+                console.log(baseURL)
+                console.error(req.statusText);
+            }
+            // scroll to top to see results
+            window.scrollTo(0, 0);
+        }
+    };
+    req.send();
+}
+
+const searchDiv = document.querySelector("#searchDiv");
+const searchButton = document.querySelector("#searchButton");
+var searchResultTable = undefined;
+searchButton.addEventListener('click', (e) => {
+    e.preventDefault();
+    var req = new XMLHttpRequest;
+    req.open("GET", baseURL, true);
+    req.setRequestHeader("table_name", "directors", false);    // set what table we are requesting
+    req.onload = (e) => {
+        if (req.readyState === 4) {
+            if (req.status === 200) {
+                var response = JSON.parse(req.responseText);
+                var allDirectors = response.rows
+                // check if director exists
+                var j;
+                var exists = false;
+                for (j = 0; j < allDirectors.length; j++) {
+                    if (`${allDirectors[j].first_name.toLowerCase()} ${allDirectors[j].last_name.toLowerCase()}` == searchInput.value.toLowerCase()) {
+                        exists = true;
+                    }
+                }
+                if (exists) {
+                    if (searchResultTable != undefined) {
+                        searchResultTable.remove();
+                    }
+                    searchResultTable = document.createElement("table");
+                    searchHeaderRow = document.createElement("tr");
+                    const searchInput = document.querySelector("#searchInput");
+                    makeCell(`${searchInput.value}'s movies:`, searchHeaderRow);
+                    var new_req = new XMLHttpRequest();
+                    new_req.open("GET", baseURL, true);
+                    new_req.setRequestHeader("table_name", "movies", false);    // set what table we are requesting
+                    new_req.onload = (e) => {
+                        if (new_req.readyState === 4) {
+                            if (new_req.status === 200) {
+
+                                var response = JSON.parse(new_req.responseText);
+                                var movies = response.rows
+                                var i = 0;
+                                var results = [];
+                                for (i = 0; i < movies.length; i++) {
+                                    if (movies[i].director.toLowerCase() == searchInput.value.toLowerCase()) {
+                                        // make a row for this movie
+                                        results.push(movies[i]);
+                                    }
+                                }
+                                if (results.length == 0) {
+                                    alert(`Sorry, ${searchInput.value} doesn't seem to be affiliated with any movies.`)
+                                }
+
+                                searchResultTable.appendChild(searchHeaderRow);
+                                for (i = 0; i < results.length; i++) {
+                                    // movie data
+                                    searchResultRow = document.createElement("tr");
+                                    makeCell(results[i].title, searchResultRow);
+
+                                    // append
+                                    searchResultTable.appendChild(searchResultRow);
+                                    searchDiv.firstElementChild.firstElementChild.appendChild(searchResultTable)
+                                }
+
+                            } else {
+                                console.log(baseURL)
+                                console.error(req.statusText);
+                            }
+                        }
+                    };
+                    new_req.send();
+                }
+                if (!exists) {
+                    alert(`Sorry, ${searchInput.value} does not exist in our database.`)
+                }
+            } else {
+                console.error(req.statusText);
+            }
+        }
+    };
+    req.send();
+});

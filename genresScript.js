@@ -44,18 +44,29 @@ const makeRow = (currentRow, table) => {
     // new cell text
     var idCellText = document.createTextNode(currentRow.genre_id);
     // hide cell
-    idCell.style.visibility = "hidden";
+    idCell.style.display = "none";
     // append text to cell
     idCell.appendChild(idCellText);
-    // append cell to row
     row.appendChild(idCell);
+
 
     // make cell for each datum
     makeCell(currentRow.name, row);
 
+    // view movies button
+    viewMoviesButton = document.createElement("button");
+    viewMoviesButton.innerHTML = "View movies";
+    viewMoviesButton.id = "viewMoviesButton";
+    // new cell
+    var viewMoviesCell = document.createElement("td");
+    // append button to cell
+    viewMoviesCell.appendChild(viewMoviesButton);
+    // append cell to row
+    row.append(viewMoviesCell);
+
     // edit button
     editButton = document.createElement("button");
-    editButton.innerHTML = "update";
+    editButton.innerHTML = "edit";
     editButton.id = "updateButton";
     // new cell
     var editCell = document.createElement("td")
@@ -127,6 +138,7 @@ newRowSubmit.addEventListener('submit', (e) => {
                 // rebuild from scratch
                 makeTable(allRows);
                 // return success or failure here
+                alert(`added genre ${payload.name}`)
             } else {
                 console.error(req.statusText);
             }
@@ -145,6 +157,9 @@ table.addEventListener('click', (event) => {
     if (target.id == "deleteButton") {
         onDelete(target)
     };
+    if (target.id == "viewMoviesButton") {
+        onViewMovies(target);
+    };
 });
 
 var updateBool = false;
@@ -162,7 +177,7 @@ const onUpdate = (target) => {
     // new header
     updateHeader = document.createElement("h1");
     // text content of header
-    updateHeader.innerHTML = "Update Form";
+    updateHeader.innerHTML = "Edit Form";
     // append header to body
     document.body.appendChild(updateHeader);
 
@@ -172,11 +187,16 @@ const onUpdate = (target) => {
     // new form
     updateForm = document.createElement("form");
     // append form to document
+    fieldset = document.createElement("fieldset");
+    legend = document.createElement("legend");
+    legend.innerHTML = "Edit Form";
+    fieldset.appendChild(legend);
+    updateForm.appendChild(fieldset);
     document.body.appendChild(updateForm);
 
     // first_name label
     var nameLabel = document.createElement("label");
-    nameLabel.innerText = "Name:"
+    nameLabel.innerText = "Genre Name:"
     // name field
     var nameInput = document.createElement("input");
     // first_name field input type
@@ -187,14 +207,16 @@ const onUpdate = (target) => {
     nameInput.defaultValue = currentElement.innerText;
     // append
     nameLabel.appendChild(nameInput);
-    updateForm.appendChild(nameLabel);
+    fieldset.appendChild(nameLabel);
 
     // submit button
     var updateSubmit = document.createElement("input");
     updateSubmit.setAttribute("type", "submit");
     updateSubmit.value = "submit";
     // append
-    updateForm.appendChild(updateSubmit);
+    fieldset.appendChild(updateSubmit);
+
+    window.scrollTo(0, document.body.scrollHeight);
 
     updateSubmit.addEventListener('click', (e) => {
         e.preventDefault();
@@ -218,6 +240,7 @@ const onUpdate = (target) => {
                     // rebuild from scratch
                     makeTable(allRows);
                     updateBool = false;
+                    alert(`succesfully updated genre name to ${payload.name}`)
                 } else {
                     console.error(req.statusText);
                 }
@@ -253,6 +276,7 @@ const onDelete = (target) => {
                     if (allRows[i].genre_id == deleteID) {
                         alert(`Sorry, ${allRows[i].name} cannot be deleted while listed as the genre of ${allRows[i].title}`);
                         fkConflict = true;
+                        return;
                     }
                 }
                 if (!fkConflict) {
@@ -292,3 +316,138 @@ sendDeleteRequest = (deleteID) => {
     }
     del_req.send(JSON.stringify(payload));
 }
+
+onViewMovies = (target) => {
+    //             button cell       row        id cell           id value
+    var searchID = target.parentNode.parentNode.firstElementChild.innerHTML;
+    var name = target.parentNode.parentNode.firstElementChild.nextElementSibling.innerHTML;
+    if (searchResultTable != undefined) {
+        searchResultTable.remove();
+    }
+    searchResultTable = document.createElement("table");
+    searchHeaderRow = document.createElement("tr");
+    searchHeaderRow.style = "font-weight: bold"
+    // headers
+    makeCell(`Movies with genre ${name}`, searchHeaderRow)
+    var req = new XMLHttpRequest();
+    req.open("GET", baseURL, true);
+    req.setRequestHeader("table_name", "genre_instances", false);    // set what table we are requesting
+    req.onload = (e) => {
+        if (req.readyState === 4) {
+            if (req.status === 200) {
+
+                var response = JSON.parse(req.responseText);
+                var all = response.rows
+                var i = 0;
+                var results = [];
+                for (i = 0; i < all.length; i++) {
+                    if (all[i].genre_id == searchID) {
+                        // make a row for this movie
+                        results.push(all[i]);
+                    }
+                }
+                if (results.length == 0) {
+                    alert("Sorry, no movies with that genre.")
+                    return;
+                }
+                searchResultTable.appendChild(searchHeaderRow);
+                for (i = 0; i < results.length; i++) {
+                    // movie data
+                    searchResultRow = document.createElement("tr");
+                    makeCell(results[i].title, searchResultRow);
+
+                    // append
+                    searchResultTable.appendChild(searchResultRow);
+                    searchDiv.firstElementChild.firstElementChild.appendChild(searchResultTable);
+                }
+                window.scrollTo(0, 0);
+            } else {
+                console.log(baseURL)
+                console.error(req.statusText);
+            }
+        }
+    };
+    req.send();
+}
+
+const searchDiv = document.querySelector("#searchDiv");
+const searchButton = document.querySelector("#searchButton");
+var searchResultTable = undefined;
+searchButton.addEventListener('click', (e) => {
+    e.preventDefault();
+    var req = new XMLHttpRequest;
+    req.open("GET", baseURL, true);
+    req.setRequestHeader("table_name", "genres", false);    // set what table we are requesting
+    req.onload = (e) => {
+        if (req.readyState === 4) {
+            if (req.status === 200) {
+                var response = JSON.parse(req.responseText);
+                var all = response.rows
+                // check if genre exists
+                var j;
+                var exists = false;
+                for (j = 0; j < all.length; j++) {
+                    if (`${all[j].name.toLowerCase()}` == searchInput.value.toLowerCase()) {
+                        exists = true;
+                    }
+                }
+                if (exists) {
+                    if (searchResultTable != undefined) {
+                        searchResultTable.remove();
+                    }
+                    searchResultTable = document.createElement("table");
+                    searchHeaderRow = document.createElement("tr");
+                    searchHeaderRow.style = "font-weight: bold;"
+                    const searchInput = document.querySelector("#searchInput");
+                    makeCell(`Movies with ${searchInput.value} as a genre:`, searchHeaderRow);
+                    var new_req = new XMLHttpRequest();
+                    new_req.open("GET", baseURL, true);
+                    new_req.setRequestHeader("table_name", "genre_instances", false);    // set what table we are requesting
+                    new_req.onload = (e) => {
+                        if (new_req.readyState === 4) {
+                            if (new_req.status === 200) {
+
+                                var response = JSON.parse(new_req.responseText);
+                                var genreInstances = response.rows
+                                var i = 0;
+                                var results = [];
+                                for (i = 0; i < genreInstances.length; i++) {
+                                    if (genreInstances[i].name.toLowerCase() == searchInput.value.toLowerCase()) {
+                                        // make a row for this movie
+                                        results.push(genreInstances[i]);
+                                    }
+                                }
+                                if (results.length == 0) {
+                                    alert(`Sorry, ${searchInput.value} doesn't seem to be affiliated with any movies.`)
+                                }
+
+                                searchResultTable.appendChild(searchHeaderRow);
+                                for (i = 0; i < results.length; i++) {
+                                    // movie data
+                                    searchResultRow = document.createElement("tr");
+                                    makeCell(results[i].title, searchResultRow);
+
+                                    // append
+                                    searchResultTable.appendChild(searchResultRow);
+                                    searchDiv.firstElementChild.firstElementChild.appendChild(searchResultTable)
+                                }
+
+                            } else {
+                                console.log(baseURL)
+                                console.error(req.statusText);
+                            }
+                        }
+                    };
+                    new_req.send();
+                }
+                if (!exists) {
+                    alert(`Sorry, ${searchInput.value} does not exist in our database.`)
+                }
+            } else {
+                console.error(req.statusText);
+            }
+        }
+    };
+    req.send();
+
+});

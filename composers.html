@@ -1,14 +1,16 @@
 <!DOCTYPE html>
 <html>
- <head>
-  <meta charset="UTF-8">
-  <title>Composers</title>
-  <link rel="stylesheet" href="styles.css">
-<link
-    href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400&display=swap"
-    rel="stylesheet">
- </head>
- <body>
+
+<head>
+    <meta charset="UTF-8">
+    <title>Composers</title>
+    <link rel="stylesheet" href="styles.css">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400&display=swap"
+        rel="stylesheet">
+</head>
+
+<body>
     <nav class="navbar-container">
         <ul class="navbar-list">
             <li><a href="movies.html">View movies</a></li>
@@ -21,42 +23,49 @@
             </li>
         </ul>
     </nav>
-  <h1>Add, Delete, or Edit Composers</h1>
-  <div class='table-and-forms'>
-      <table id="composersTable">
-        <tbody>
-          <thead>
-              <row>
-                  <th></th>
-                  <th>First Name</th>
-                  <th>Last Name</th>
-                  <th></th>
-                  <th></th>
-              </row>
-          </thead>
-          </tbody>
-      </table>
-      <form id="addComposerForm">
-          <fieldset>
-            <br>
-            <legend>Add a New Composer</legend>
-            <input type="text" id="firstNameInput" placeholder="First Name"><br>
-            <input type="text" id="lastNameInput" placeholder="Last Name"><br>
-            <input type="submit" value="submit" />
-          </fieldset>
-      </form>
+    <h1>Composers</h1>
+    <div class='table-and-forms'>
+        
+        <div id="searchDiv">
+            <form id="composerSearch">
+                <fieldset>
+                    <legend>Search for a Composer</legend>
+                    <input type="text" id="searchInput" placeholder="Composer Name">
+                    <button type="submit" form="composerSearch" value="submit"
+                        id="searchButton">Search</button>
+                </fieldset>
+            </form>
+        </div>
 
-    <form id="composerSearch">
-        <fieldset>
-            <legend>Search For a composer</legend>
-            <input type="text" id="composerSearchInput" placeholder="Composer Name">
-            <button type="submit" form="composerSearch"
-                value="Submit">Search</button>
-        </fieldset>
-    </form>
+        <form id="addComposerForm">
+            <fieldset>
+                <legend>Add New Composer</legend>
+                <label>
+                    First Name:
+                    <input type="text" name="firstNameInput" id="firstNameInput" />
+                </label>
+                <label>
+                    Last Name:
+                    <input type="text" name="lastNameInput" id="lastNameInput" />
+                </label>
+                <input type="submit" value="submit" />
+            </fieldset>
+        </form>     
 
+        <table id="composersTable">
+            <tbody>
+                <thead>
+                    <row>
+                        <th style="display: none;"></th>
+                        <th>First Name</th>
+                        <th>Last Name</th>
+                    </row>
+                </thead>
+            </tbody>
+        </table>
 
-  </div>
-  <script src="composersScript.js"></script>
- </body>
+    </div>
+    <script src="composersScript.js"></script>
+</body>
+
 </html>

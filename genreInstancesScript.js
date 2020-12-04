@@ -43,7 +43,7 @@ const makeRow = (currentRow, table) => {
     // new cell text
     var genreIDCellText = document.createTextNode(currentRow.genre_id);
     // hide cell
-    genreIDCell.style.visibility = "hidden";
+    genreIDCell.style.display = "none";
     // append text to cell
     genreIDCell.appendChild(genreIDCellText);
     // append cell to row
@@ -55,7 +55,7 @@ const makeRow = (currentRow, table) => {
     // new cell text
     var movieIDCellText = document.createTextNode(currentRow.movie_id);
     // hide cell
-    movieIDCell.style.visibility = "hidden";
+    movieIDCell.style.display = "none";
     // append text to cell
     movieIDCell.appendChild(movieIDCellText);
     // append cell to row
@@ -116,7 +116,6 @@ newRowSubmit.addEventListener('submit', (e) => {
 
     payload.genre_id = document.getElementById("addGenresSelect").value;
     payload.movie_id = document.getElementById("addMoviesSelect").value;
-
     req.open("POST", baseURL, true);
     req.setRequestHeader('Content-Type', 'application/json');
     req.onload = (e) => {
@@ -130,6 +129,7 @@ newRowSubmit.addEventListener('submit', (e) => {
                 // rebuild from scratch
                 makeTable(allRows);
                 // return success or failure here
+                alert("added the desired genre instance");
             } else {
                 console.error(req.statusText);
             }

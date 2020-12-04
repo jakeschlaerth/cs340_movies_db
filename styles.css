@@ -1,6 +1,6 @@
 .navbar-container{
     border-radius: 12px;
-    width: 80%;
+    width: 95%;
     margin: 0 auto;
 }
 
@@ -38,6 +38,7 @@ table {
     width: 80%;
     margin-left: auto;
     margin-right: auto;
+    margin-top: 20px;
     table-layout: fixed;
 }
 
@@ -76,7 +77,23 @@ input {
 }
 
 fieldset {
-    width: 78%;
+     /* width: 78%; */
     margin: 0 auto;
 }
+
+button{
+    margin: 10px 10px;
+    width: 90%;
+    max-width: 150px;;
+}
+
+#searchButton {
+    width: 150px;
+}
+
+fieldset{
+    margin: 20px;
+}
+
+
 

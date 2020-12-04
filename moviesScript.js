@@ -21,7 +21,6 @@ req.onload = (e) => {
 };
 req.send();
 
-
 // reference for table
 const table = document.getElementById('moviesTable');
 
@@ -32,12 +31,12 @@ const makeTable = (allRows) => {
     };
 };
 
-const makeGenreInstanceTable = (allRows) => {
-    for (var row = 0; row < allRows.length; row++) {
-        var currentRow = allRows[row];
-        makeGenreInstanceRow(currentRow, table);
-    };
-}; 
+// const makeGenreInstanceTable = (allRows) => {
+//     for (var row = 0; row < allRows.length; row++) {
+//         var currentRow = allRows[row];
+//         makeGenreInstanceRow(currentRow, table);
+//     };
+// }; 
 
 const makeRow = (currentRow, table) => {
     // reference for moviesTable body
@@ -51,7 +50,7 @@ const makeRow = (currentRow, table) => {
     // new cell text
     var idCellText = document.createTextNode(currentRow.movie_id);
     // hide cell
-    idCell.style.visibility = "hidden";
+    idCell.style.display = "none";
     // append text to cell
     idCell.appendChild(idCellText);
     // append cell to row
@@ -68,8 +67,9 @@ const makeRow = (currentRow, table) => {
 
     // view genres button
     viewGenresButton = document.createElement("button");
-    viewGenresButton.innerHTML = "View genres";
+    viewGenresButton.innerHTML = "View genres and actors";
     viewGenresButton.id = "viewGenresButton";
+    viewGenresButton.style = "cursor: pointer;"
     // new cell
     var viewGenresCell = document.createElement("td");
     // append button to cell
@@ -77,20 +77,9 @@ const makeRow = (currentRow, table) => {
     // append cell to row
     row.append(viewGenresCell);
 
-    // view Actors button
-    viewActorsButton = document.createElement("button");
-    viewActorsButton.innerHTML = "View actors";
-    viewActorsButton.id = "viewActorsButton";
-    // new cell
-    var viewActorsCell = document.createElement("td");
-    // append button to cell
-    viewActorsCell.appendChild(viewActorsButton);
-    // append cell to row
-    row.append(viewActorsCell);
-
     // update button
     updateButton = document.createElement("button");
-    updateButton.innerHTML = "update";
+    updateButton.innerHTML = "edit";
     updateButton.id = "updateButton";
     // new cell
     var updateCell = document.createElement("td");
@@ -114,53 +103,53 @@ const makeRow = (currentRow, table) => {
     tbody.appendChild(row)
 };
 
-const makeGenreInstanceRow = (currentRow, table) => {
-    // reference for moviesTable body
-    var tbody = table.firstElementChild;
-    // new row
-    var row = document.createElement("tr");
+// const makeGenreInstanceRow = (currentRow, table) => {
+//     // reference for moviesTable body
+//     var tbody = table.firstElementChild;
+//     // new row
+//     var row = document.createElement("tr");
 
-    // gnere_id will be hidden
-    // new cell
-    var genreIDCell = document.createElement("td");
-    // new cell text
-    var genreIDCellText = document.createTextNode(currentRow.genre_id);
-    // hide cell
-    genreIDCell.style.display = "none";
-    // append text to cell
-    genreIDCell.appendChild(genreIDCellText);
-    // append cell to row
-    row.appendChild(genreIDCell);
+//     // gnere_id will be hidden
+//     // new cell
+//     var genreIDCell = document.createElement("td");
+//     // new cell text
+//     var genreIDCellText = document.createTextNode(currentRow.genre_id);
+//     // hide cell
+//     genreIDCell.style.display = "none";
+//     // append text to cell
+//     genreIDCell.appendChild(genreIDCellText);
+//     // append cell to row
+//     row.appendChild(genreIDCell);
 
-    // movie_id will be hidden
-    // new cell
-    var movieIDCell = document.createElement("td");
-    // new cell text
-    var movieIDCellText = document.createTextNode(currentRow.movie_id);
-    // hide cell
-    movieIDCell.style.display = "none";
-    // append text to cell
-    movieIDCell.appendChild(movieIDCellText);
-    // append cell to row
-    row.appendChild(movieIDCell);
+//     // movie_id will be hidden
+//     // new cell
+//     var movieIDCell = document.createElement("td");
+//     // new cell text
+//     var movieIDCellText = document.createTextNode(currentRow.movie_id);
+//     // hide cell
+//     movieIDCell.style.display = "none";
+//     // append text to cell
+//     movieIDCell.appendChild(movieIDCellText);
+//     // append cell to row
+//     row.appendChild(movieIDCell);
 
-    // make cell for each datum
-    makeCell(currentRow.title, row);
-    makeCell(currentRow.name, row);
+//     // make cell for each datum
+//     makeCell(currentRow.title, row);
+//     makeCell(currentRow.name, row);
 
-    deleteButton = document.createElement("button");
-    deleteButton.innerHTML = "delete";
-    deleteButton.id = "deleteButton";
-    // new cell
-    var deleteCell = document.createElement("td")
-    // append button to cell
-    deleteCell.appendChild(deleteButton)
-    // append cell to row
-    row.append(deleteCell)
+//     deleteButton = document.createElement("button");
+//     deleteButton.innerHTML = "delete";
+//     deleteButton.id = "deleteButton";
+//     // new cell
+//     var deleteCell = document.createElement("td")
+//     // append button to cell
+//     deleteCell.appendChild(deleteButton)
+//     // append cell to row
+//     row.append(deleteCell)
 
-    // // append row to tbody
-    tbody.appendChild(row)
-};
+//     // // append row to tbody
+//     tbody.appendChild(row)
+// };
 
 const makeCell = (data, row) => {
     // new cell
@@ -250,7 +239,7 @@ getComposers = (currentCom, selectInput) => {
     req.send();
 }
 
-// populates genres
+// populates genres for search results
 getGenres = (movieID, resultsTable) => {
     var req = new XMLHttpRequest();
     req.open("GET", baseURL, true);
@@ -261,7 +250,6 @@ getGenres = (movieID, resultsTable) => {
                 // this is where the magic happens              
                 var response = JSON.parse(req.responseText);
                 var genreInstancesArray = response.rows;
-                // composerSelect = document.querySelector("#composerSelect");
                 var i;
                 var genreArray = [];
                 for (i = 0; i < genreInstancesArray.length; i++) {
@@ -281,6 +269,41 @@ getGenres = (movieID, resultsTable) => {
 
             } else {
                 console.log(baseURL)
+                console.error(req.statusText);
+            }
+        }
+    };
+    req.send();
+}
+
+// populates actors for search results
+getActors = (movieID, resultsTable) => {
+    var req = new XMLHttpRequest();
+    req.open("GET", baseURL, true);
+    req.setRequestHeader("table_name", "performances", false);    // set what table we are requesting
+    req.onload = (e) => {
+        if (req.readyState === 4) {
+            if (req.status === 200) {
+                // this is where the magic happens              
+                var response = JSON.parse(req.responseText);
+                var performancesArray = response.rows;
+                var i;
+                var actorArray = [];
+                for (i = 0; i < performancesArray.length; i++) {
+
+                    if (performancesArray[i].movie_id === movieID) {
+                        actorArray.push(performancesArray[i].actor);
+                    }
+                }
+                actorRow = document.createElement("tr");
+                makeCell("Actors:", actorRow);
+                for (i = 0; i < actorArray.length; i++) {
+                    makeCell(actorArray[i], actorRow)
+                }
+                resultsTable.appendChild(actorRow);
+
+            } else {
+                console.log(baseURL);
                 console.error(req.statusText);
             }
         }
@@ -324,6 +347,7 @@ newRowSubmit.addEventListener('submit', (e) => {
                 // rebuild from scratch
                 makeTable(allRows);
                 // return success or failure here
+                alert(`added movie ${payload.title}`);
             } else {
                 console.error(req.statusText);
             }
@@ -365,7 +389,7 @@ const onUpdate = (target) => {
     // new header
     updateHeader = document.createElement("h1");
     // text content of header
-    updateHeader.innerHTML = "Update Form";
+    updateHeader.innerHTML = "Edit Form";
 
     mainTableContainer = document.querySelector("mainTableContainer");
 
@@ -528,29 +552,50 @@ const onDelete = (target) => {
 };
 
 onViewGenres = (target) => {
+    window.scrollTo(0, document.body.scrollHeight);
     //             button cell       row        id cell           id value
-    var movieID = target.parentNode.parentNode.firstElementChild.innerHTML;
+    var searchID = target.parentNode.parentNode.firstElementChild.innerHTML;
+
+    if (searchResultTable != undefined) {
+        searchResultTable.remove();
+    }
+    searchResultTable = document.createElement("table");
+    searchHeaderRow = document.createElement("tr");
+    searchHeaderRow.style = "font-weight: bold;"
+    searchResultRow = document.createElement("tr");
     var req = new XMLHttpRequest();
     req.open("GET", baseURL, true);
-    // set what table we are requesting
-    req.setRequestHeader("table_name", "genre_instances", false);
+    req.setRequestHeader("table_name", "movies", false);    // set what table we are requesting
     req.onload = (e) => {
         if (req.readyState === 4) {
             if (req.status === 200) {
-                var response = JSON.parse(req.responseText);
-                var genreInstances = response.rows;
-                deleteTable();
-                table.deleteRow(0);
-                //changeHeadersToGenreInstance();
-                // console.log(genreInstances);
-                var i;
-                for (i = 0; i < genreInstances.length; i++) {
-                    if (genreInstances[i].movie_id != movieID) {
-                        genreInstances.splice(i);
-                    }
-                }
-                makeGenreInstanceTable(genreInstances);
 
+                var response = JSON.parse(req.responseText);
+                var movies = response.rows
+                var i = 0;
+                for (i = 0; i < movies.length; i++) {
+                    if (movies[i].movie_id == searchID) {
+                        // headers
+                        makeCell("Movie Title", searchHeaderRow);
+                        makeCell("Release Year", searchHeaderRow);
+                        makeCell("Director", searchHeaderRow);
+                        makeCell("Composer", searchHeaderRow);
+
+                        makeCell(movies[i].title, searchResultRow);
+                        makeCell(movies[i].release_year, searchResultRow);
+                        makeCell(movies[i].director, searchResultRow);
+                        makeCell(movies[i].composer, searchResultRow);
+
+                        // const searchResultsGenresRow = document.createElement("tr");
+                        getGenres(movies[i].movie_id, searchResultTable);
+                        getActors(movies[i].movie_id, searchResultTable);
+                        // makeCell(movies[i].composer, searchResultRow);
+                        searchResultTable.appendChild(searchHeaderRow);
+                        searchResultTable.appendChild(searchResultRow);
+                        searchDiv.firstElementChild.firstElementChild.appendChild(searchResultTable)
+                        window.scrollTo(0, 0);
+                    }  
+                }                
             } else {
                 console.log(baseURL)
                 console.error(req.statusText);
@@ -560,32 +605,17 @@ onViewGenres = (target) => {
     req.send();
 }
 
-function changeHeadersToGenreInstance() {
-    // select the header row
-    var headerRow = document.getElementById("headerRow");
-
-    // change the second column header to genres
-    headerRow.firstElementChild.nextElementSibling.nextElementSibling.textContent = "genre";
-    console.log(headerRow.cells.length); 
-
-    /*for (i = 0; i < headerRow.cells.length; i++) {
-        if (headerRow.cells[i].textContent != "title" || headerRow.cells[i].textContent != "genre") {
-            headerRow.deleteCell(i);
-        }
-    }*/
-}
-
 const searchDiv = document.querySelector("#searchDiv");
 const searchButton = document.querySelector("#searchButton");
 var searchResultTable = undefined;
 searchButton.addEventListener('click', (e) => {
-
     e.preventDefault();
     if (searchResultTable != undefined) {
         searchResultTable.remove();
     }
     searchResultTable = document.createElement("table");
     searchHeaderRow = document.createElement("tr");
+    searchHeaderRow.style = "font-weight: bold"
     searchResultRow = document.createElement("tr");
     const searchInput = document.querySelector("#searchInput")
     var req = new XMLHttpRequest();
@@ -615,13 +645,12 @@ searchButton.addEventListener('click', (e) => {
                         makeCell(movies[i].director, searchResultRow);
                         makeCell(movies[i].composer, searchResultRow);
 
-                        // const searchResultsGenresRow = document.createElement("tr");
-                        getGenres(movies[i].movie_id, searchResultTable)
-                        // makeCell(movies[i].composer, searchResultRow);
+                        getGenres(movies[i].movie_id, searchResultTable);
+                        getActors(movies[i].movie_id, searchResultTable);
+
                         searchResultTable.appendChild(searchHeaderRow);
                         searchResultTable.appendChild(searchResultRow);
                         searchDiv.firstElementChild.firstElementChild.appendChild(searchResultTable)
-                        // console.log(movies[i]);
                     }
                 }
             } else {

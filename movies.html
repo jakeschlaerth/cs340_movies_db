@@ -26,24 +26,7 @@
                 </li>
             </ul>
         </nav>
-        
-        <div id="mainTableContainer">
-                <table id="moviesTable">
-                    <tr id='headerRow'>
-                        <th style="visibility:hidden;">id</th>
-                        <th>title</th>
-                        <th>year</th>
-                        <th>director</th>
-                        <th>composer</th>
-                        <th></th>
-                        <th></th>
-                        <th></th>
-                        <th></th>
-                    </tr>
-                </table>
-        </div>
 
-        <!-- <h1>Add New Movie</h1> -->
         <form method="POST" id="addMovieForm">
             <fieldset>
                 <legend>Add New Movie</legend>
@@ -80,6 +63,18 @@
                         value="submit" id="searchButton">Search</button>
                 </fieldset>
             </form>
+        </div>
+
+        <div id="mainTableContainer">
+            <table id="moviesTable">
+                <tr id='headerRow'>
+                    <th style="display: none;">id</th>
+                    <th>title</th>
+                    <th>year</th>
+                    <th>director</th>
+                    <th>composer</th>
+                </tr>
+            </table>
         </div>
 </body>
 <script src="moviesScript.js"></script>

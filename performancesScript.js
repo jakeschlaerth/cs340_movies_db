@@ -22,7 +22,6 @@ req.onload = (e) => {
 };
 req.send();
 
-
 // reference for table
 const table = document.getElementById('performancesTable');
 
@@ -46,7 +45,7 @@ const makeRow = (currentRow, table) => {
     // new cell text
     var actorIDCellText = document.createTextNode(currentRow.actor_id);
     // hide cell
-    actorIDCell.style.visibility = "hidden";
+    actorIDCell.style.display = "none";
     // append text to cell
     actorIDCell.appendChild(actorIDCellText);
     // append cell to row
@@ -58,7 +57,7 @@ const makeRow = (currentRow, table) => {
     // new cell text
     var movieIDCellText = document.createTextNode(currentRow.movie_id);
     // hide cell
-    movieIDCell.style.visibility = "hidden";
+    movieIDCell.style.display = "none";
     // append text to cell
     movieIDCell.appendChild(movieIDCellText);
     // append cell to row
@@ -137,6 +136,7 @@ newRowSubmit.addEventListener('submit', (e) => {
                 // rebuild from scratch
                 makeTable(allRows);
                 // return success or failure here
+                alert("added desired performance")
             } else {
                 console.error(req.statusText);
             }

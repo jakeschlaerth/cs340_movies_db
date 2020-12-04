@@ -23,41 +23,46 @@
             </li>
         </ul>
     </nav>
-    <h1>Add, Delete, or Edit Directors</h1>
+    <h1>Directors</h1>
     <div class='table-and-forms'>
-        <table id='directorsTable'>
-            <tbody>
-                <thead>
-                    <row>
-                        <th></th>
-                        <th>First Name</th>
-                        <th>Last Name</th>
-                        <th></th>
-                        <th></th>
-                        <th></th>
-                    </row>
-                </thead>
-            </tbody>
-        </table>
-        <form id="addDirectorForm">
+        
+        <form method="POST" id="addDirectorForm">
             <fieldset>
-                <br>
-                <legend>Add a New Director</legend>
-                <input type="text" id="firstNameInput" placeholder="First Name"><br>
-                <input type="text" id="lastNameInput" placeholder="Last Name"><br>
+                <legend>Add New Director</legend>
+                <label>
+                    First Name:
+                    <input type="text" name="firstNameInput" id="firstNameInput" />
+                </label>
+                <label>
+                    Last Name:
+                    <input type="text" name="lastNameInput" id="lastNameInput" />
+                </label>
                 <input type="submit" value="submit" />
             </fieldset>
         </form>
 
-        <form id="directorSearch">
-            <fieldset>
-                <legend>Search For a director</legend>
-                <input type="text" id="directorSearchInput"
-                    placeholder="Director Name">
-                <button type="submit" form="directorSearch"
-                    value="Submit">Search</button>
-            </fieldset>
-        </form>
+        <div id="searchDiv">
+            <form id="directorSearch">
+                <fieldset>
+                    <legend>Search For a Director</legend>
+                    <input type="text" id="searchInput" placeholder="Director Name">
+                    <button type="submit" form="directorSearch" value="submit"
+                        id="searchButton">Search</button>
+                </fieldset>
+            </form>
+        </div>
+
+        <table id='directorsTable'>
+            <tbody>
+                <thead>
+                    <row>
+                        <th style="display: none"></th>
+                        <th>First Name</th>
+                        <th>Last Name</th>
+                    </row>
+                </thead>
+            </tbody>
+        </table>
 
 
     </div>

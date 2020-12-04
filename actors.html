@@ -23,44 +23,49 @@
             </li>
         </ul>
     </nav>
-    <h1>Add, Delete, or Edit Actors</h1>
+
     <div class='table-and-forms'>
-        <table id="actorsTable">
-            
-            <thead>
-                <row>
-                    <th style="visibility: hidden;"></th>
-                    <th>First Name</th>
-                    <th>Last Name</th>
-                    <th></th>
-                    <th></th>
-                </row>
-            </thead>
-            <tbody>
-                
-            </tbody>
-        </table>
-        <h2>Add New Actor</h2>
+
         <form method="POST" id="addActorForm">
             <fieldset>
+                <legend>Add New Actor</legend>
                 <label>
                     First Name:
-                    <input type="text" name="firstNameInput" id="firstNameInput"/>
+                    <input type="text" name="firstNameInput"
+                        id="firstNameInput" />
                 </label>
                 <label>
                     Last Name:
-                    <input type="text" name="lastNameInput" id="lastNameInput"/>
-                </label>    
-                <input type="submit" value="submit"/>
+                    <input type="text" name="lastNameInput"
+                        id="lastNameInput" />
+                </label>
+                <input type="submit" value="submit" />
             </fieldset>
         </form>
-        <form id="actorSearch">
-            <fieldset>
-                <legend>Search for an Actor</legend>
-                <input type="text" id="actorSearchInput" placeholder="Actor Name">
-                <button type="submit" form="actorSearch" value="Submit">Search</button>
-            </fieldset>
-        </form>
+        <div id="searchDiv">
+            <form id="actorSearch">
+                <fieldset>
+                    <legend>Search for an Actor</legend>
+                    <input type="text" id="searchInput"
+                        placeholder="Actor Name">
+                    <button type="submit" form="actorSearch"
+                        value="Submit" id="searchButton">Search</button>
+                </fieldset>
+            </form>
+        </div>
+        <h1>Actors</h1>
+        <table id="actorsTable">
+            <thead>
+                <row>
+                    <th style="display: none;"></th>
+                    <th>First Name</th>
+                    <th>Last Name</th>
+                </row>
+            </thead>
+            <tbody>
+
+            </tbody>
+        </table>
 
 
     </div>
