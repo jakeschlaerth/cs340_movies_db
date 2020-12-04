@@ -32,6 +32,13 @@ const makeTable = (allRows) => {
     };
 };
 
+const makeGenreInstanceTable = (allRows) => {
+    for (var row = 0; row < allRows.length; row++) {
+        var currentRow = allRows[row];
+        makeGenreInstanceRow(currentRow, table);
+    };
+}; 
+
 const makeRow = (currentRow, table) => {
     // reference for moviesTable body
     var tbody = table.firstElementChild;
@@ -104,6 +111,54 @@ const makeRow = (currentRow, table) => {
     row.append(deleteCell)
 
     // append row to tbody
+    tbody.appendChild(row)
+};
+
+const makeGenreInstanceRow = (currentRow, table) => {
+    // reference for moviesTable body
+    var tbody = table.firstElementChild;
+    // new row
+    var row = document.createElement("tr");
+
+    // gnere_id will be hidden
+    // new cell
+    var genreIDCell = document.createElement("td");
+    // new cell text
+    var genreIDCellText = document.createTextNode(currentRow.genre_id);
+    // hide cell
+    genreIDCell.style.visibility = "hidden";
+    // append text to cell
+    genreIDCell.appendChild(genreIDCellText);
+    // append cell to row
+    row.appendChild(genreIDCell);
+
+    // movie_id will be hidden
+    // new cell
+    var movieIDCell = document.createElement("td");
+    // new cell text
+    var movieIDCellText = document.createTextNode(currentRow.movie_id);
+    // hide cell
+    movieIDCell.style.visibility = "hidden";
+    // append text to cell
+    movieIDCell.appendChild(movieIDCellText);
+    // append cell to row
+    row.appendChild(movieIDCell);
+
+    // make cell for each datum
+    makeCell(currentRow.title, row);
+    makeCell(currentRow.name, row);
+
+    deleteButton = document.createElement("button");
+    deleteButton.innerHTML = "delete";
+    deleteButton.id = "deleteButton";
+    // new cell
+    var deleteCell = document.createElement("td")
+    // append button to cell
+    deleteCell.appendChild(deleteButton)
+    // append cell to row
+    row.append(deleteCell)
+
+    // // append row to tbody
     tbody.appendChild(row)
 };
 
@@ -484,14 +539,17 @@ onViewGenres = (target) => {
             if (req.status === 200) {
                 var response = JSON.parse(req.responseText);
                 var genreInstances = response.rows;
+                deleteTable();
+                table.deleteRow(0);
+                //changeHeadersToGenreInstance();
                 // console.log(genreInstances);
                 var i;
                 for (i = 0; i < genreInstances.length; i++) {
-                    if (genreInstances[i].movie_id == movieID) {
-                        // print this to the empty table
-                        console.log(genreInstances[i].name)
+                    if (genreInstances[i].movie_id != movieID) {
+                        genreInstances.splice(i);
                     }
                 }
+                makeGenreInstanceTable(genreInstances);
 
             } else {
                 console.log(baseURL)
@@ -500,6 +558,21 @@ onViewGenres = (target) => {
         }
     };
     req.send();
+}
+
+function changeHeadersToGenreInstance() {
+    // select the header row
+    var headerRow = document.getElementById("headerRow");
+
+    // change the second column header to genres
+    headerRow.firstElementChild.nextElementSibling.nextElementSibling.textContent = "genre";
+    console.log(headerRow.cells.length); 
+
+    /*for (i = 0; i < headerRow.cells.length; i++) {
+        if (headerRow.cells[i].textContent != "title" || headerRow.cells[i].textContent != "genre") {
+            headerRow.deleteCell(i);
+        }
+    }*/
 }
 
 const searchDiv = document.querySelector("#searchDiv");
