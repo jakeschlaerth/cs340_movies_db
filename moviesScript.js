@@ -657,7 +657,7 @@ searchButton.addEventListener('click', (e) => {
                     }
                 }
                 if (!exists) {
-                    alert(`Sorry, ${searchInput.value} doesn't exit in our databse.`);
+                    alert(`Sorry, ${searchInput.value} doesn't exist in our database.`);
                 }
             } else {
                 console.log(baseURL)

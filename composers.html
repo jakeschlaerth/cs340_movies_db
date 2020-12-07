@@ -18,24 +18,15 @@
             <li><a href="directors.html">View directors</a></li>
             <li><a href="composers.html">View composers</a></li>
             <li><a href="performances.html">View actor performances</a></li>
-            <li><a href="genres.html">View existing genres</a></li>
-            <li><a href="genreInstances.html">View all Genre-Movie pairings</a>
+            <li><a href="genres.html">View genres</a></li>
+            <li><a href="genreInstances.html">View genre instances</a>
             </li>
         </ul>
     </nav>
-    <h1>Composers</h1>
+    
     <div class='table-and-forms'>
         
-        <div id="searchDiv">
-            <form id="composerSearch">
-                <fieldset>
-                    <legend>Search for a Composer</legend>
-                    <input type="text" id="searchInput" placeholder="Composer Name">
-                    <button type="submit" form="composerSearch" value="submit"
-                        id="searchButton">Search</button>
-                </fieldset>
-            </form>
-        </div>
+        
 
         <form id="addComposerForm">
             <fieldset>
@@ -50,8 +41,18 @@
                 </label>
                 <input type="submit" value="submit" />
             </fieldset>
-        </form>     
-
+        </form>  
+        <div id="searchDiv">
+            <form id="composerSearch">
+                <fieldset>
+                    <legend>Search for a Composer</legend>
+                    <input type="text" id="searchInput" placeholder="Composer Name">
+                    <button type="submit" form="composerSearch" value="submit"
+                        id="searchButton">Search</button>
+                </fieldset>
+            </form>
+        </div>
+        <h1>Composers</h1>
         <table id="composersTable">
             <tbody>
                 <thead>
